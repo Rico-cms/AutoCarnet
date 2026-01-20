@@ -283,7 +283,56 @@
                 </div>
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Désignation</label>
-                    <input type="text" id="log-title" required placeholder="Ex: Vidange 10W40 + Filtres" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold transition-all placeholder:text-slate-300">
+                    <input type="text" id="log-title" required list="designation-suggestions" placeholder="Ex: Vidange 10W40 + Filtres" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold transition-all placeholder:text-slate-300">
+                    
+                    <!-- Liste de propositions exhaustive -->
+                    <datalist id="designation-suggestions">
+                        <!-- ENTRETIEN COURANT -->
+                        <option value="Vidange Moteur + Filtre à huile"></option>
+                        <option value="Remplacement Filtre à Air"></option>
+                        <option value="Remplacement Filtre Habitacle"></option>
+                        <option value="Remplacement Filtre à Carburant"></option>
+                        <option value="Recharge Climatisation"></option>
+                        <option value="Remplacement Bougies d'allumage"></option>
+                        <option value="Remplacement Balais d'essuie-glace"></option>
+                        <option value="Mise à niveau Liquide de Refroidissement"></option>
+                        <option value="Remplacement Liquide de Frein"></option>
+                        <!-- MÉCANIQUE ET RÉPARATIONS -->
+                        <option value="Remplacement Plaquettes de Frein (AV)"></option>
+                        <option value="Remplacement Plaquettes de Frein (AR)"></option>
+                        <option value="Remplacement Disques + Plaquettes"></option>
+                        <option value="Remplacement Kit de Distribution + Pompe à eau"></option>
+                        <option value="Remplacement Courroie d'Accessoire"></option>
+                        <option value="Remplacement Batterie"></option>
+                        <option value="Remplacement Pneus (Train Avant)"></option>
+                        <option value="Remplacement Pneus (Train Arrière)"></option>
+                        <option value="Géométrie et Parallélisme"></option>
+                        <option value="Remplacement Amortisseurs (AV)"></option>
+                        <option value="Remplacement Amortisseurs (AR)"></option>
+                        <option value="Remplacement Kit d'Embrayage"></option>
+                        <option value="Remplacement Alternateur"></option>
+                        <option value="Remplacement Démarreur"></option>
+                        <option value="Nettoyage Système Injection"></option>
+                        <!-- CUSTOMISATION & ESTHÉTIQUE -->
+                        <option value="Lavage Complet (Intérieur/Extérieur)"></option>
+                        <option value="Polissage et Lustrage Carrosserie"></option>
+                        <option value="Traitement Céramique"></option>
+                        <option value="Pose de Vitres Teintées"></option>
+                        <option value="Installation Autoradio Android / Apple CarPlay"></option>
+                        <option value="Installation Caméra de Recul"></option>
+                        <option value="Remplacement Jantes"></option>
+                        <option value="Peinture Étriers de Frein"></option>
+                        <option value="Reprogrammation Moteur (Stage 1)"></option>
+                        <option value="Conversion Ethanol (E85)"></option>
+                        <option value="Installation Éclairage LED"></option>
+                        <!-- PAPIERS ET ADMINISTRATIF -->
+                        <option value="Visite Technique"></option>
+                        <option value="Renouvellement Assurance"></option>
+                        <option value="Paiement Vignette Annuelle"></option>
+                        <option value="Changement de Carte Grise"></option>
+                        <option value="Contrôle Antipollution"></option>
+                        <option value="Duplicata Permis de Conduire"></option>
+                    </datalist>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
@@ -350,28 +399,42 @@
         let currentVehicleId = localStorage.getItem('autocarnet_v4_currentId') || null;
         let activeFilter = 'all';
 
-        const el = (id) => document.getElementById(id);
+        // Helper sécurisé pour récupérer les éléments par ID
+        const el = (id) => {
+            const element = document.getElementById(id);
+            if (!element) console.warn(`Élément avec l'ID "${id}" introuvable.`);
+            return element;
+        };
 
         function init() {
             if (vehicles.length === 0) {
-                el('onboarding-state').classList.remove('hidden');
-                el('app-content').classList.add('hidden');
+                const onboarding = el('onboarding-state');
+                const appContent = el('app-content');
+                if (onboarding) onboarding.classList.remove('hidden');
+                if (appContent) appContent.classList.add('hidden');
             } else {
                 if (!currentVehicleId || !vehicles.find(v => v.id === currentVehicleId)) {
                     currentVehicleId = vehicles[0].id;
                 }
-                el('onboarding-state').classList.add('hidden');
-                el('app-content').classList.remove('hidden');
-                el('bottom-nav').classList.remove('hidden');
-                el('vehicle-selector-container').classList.remove('hidden');
+                const onboarding = el('onboarding-state');
+                const appContent = el('app-content');
+                const bottomNav = el('bottom-nav');
+                const selector = el('vehicle-selector-container');
+                
+                if (onboarding) onboarding.classList.add('hidden');
+                if (appContent) appContent.classList.remove('hidden');
+                if (bottomNav) bottomNav.classList.remove('hidden');
+                if (selector) selector.classList.remove('hidden');
+                
                 renderHeader();
                 renderAll();
             }
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function renderHeader() {
             const select = el('vehicle-select');
+            if (!select) return;
             select.innerHTML = '';
             vehicles.forEach(v => {
                 const opt = document.createElement('option');
@@ -391,25 +454,37 @@
             const car = vehicles.find(v => v.id === currentVehicleId);
             if (!car) return;
 
-            el('car-title').textContent = car.make;
-            el('car-year').textContent = car.year;
-            el('car-mileage').textContent = parseInt(car.mileage).toLocaleString();
-            el('car-plate').textContent = car.plate;
-            el('car-owner').textContent = car.owner;
-            el('cert-owner').textContent = car.owner;
-            el('cert-car').textContent = `${car.make} ${car.model}`;
-            el('cert-vin').textContent = car.vin || car.plate;
+            const title = el('car-title');
+            const year = el('car-year');
+            const mileage = el('car-mileage');
+            const plate = el('car-plate');
+            const owner = el('car-owner');
+            const certOwner = el('cert-owner');
+            const certCar = el('cert-car');
+            const certVin = el('cert-vin');
+
+            if (title) title.textContent = car.make;
+            if (year) year.textContent = car.year;
+            if (mileage) mileage.textContent = parseInt(car.mileage).toLocaleString();
+            if (plate) plate.textContent = car.plate;
+            if (owner) owner.textContent = car.owner;
+            if (certOwner) certOwner.textContent = car.owner;
+            if (certCar) certCar.textContent = `${car.make} ${car.model}`;
+            if (certVin) certVin.textContent = car.vin || car.plate;
 
             const carLogs = logsByCar[currentVehicleId] || [];
             carLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             const container = el('timeline-container');
             const tbody = el('cert-table-body');
+            if (!container || !tbody) return;
+            
             container.innerHTML = '';
             tbody.innerHTML = '';
 
             const filtered = activeFilter === 'all' ? carLogs : carLogs.filter(l => l.type === activeFilter);
-            el('logs-count-badge').textContent = filtered.length;
+            const badge = el('logs-count-badge');
+            if (badge) badge.textContent = filtered.length;
 
             filtered.forEach((log, idx) => {
                 const card = document.createElement('div');
@@ -458,33 +533,44 @@
                 tbody.appendChild(tr);
             });
 
+            const statInvest = el('stat-invest');
+            const statLogs = el('stat-logs');
             const totalCost = carLogs.reduce((acc, l) => acc + (parseInt(l.cost) || 0), 0);
-            el('stat-invest').textContent = new Intl.NumberFormat().format(totalCost) + ' F';
-            el('stat-logs').textContent = carLogs.length;
+            if (statInvest) statInvest.textContent = new Intl.NumberFormat().format(totalCost) + ' F';
+            if (statLogs) statLogs.textContent = carLogs.length;
 
             // Next Service Logic LuxUI
             const oilChanges = carLogs.filter(l => l.title.toLowerCase().includes('vidange'));
-            if(oilChanges.length > 0) {
-                const lastMileage = parseInt(oilChanges[0].mileage);
-                const nextMileage = lastMileage + 10000;
-                el('stat-next-service').textContent = nextMileage.toLocaleString() + ' km';
-                el('stat-next-service').className = (nextMileage < parseInt(car.mileage)) ? "font-black text-red-500 text-xl" : "font-black text-slate-800 text-xl";
-            } else { el('stat-next-service').textContent = '-'; }
+            const statNext = el('stat-next-service');
+            if(statNext) {
+                if(oilChanges.length > 0) {
+                    const lastMileage = parseInt(oilChanges[0].mileage);
+                    const nextMileage = lastMileage + 10000;
+                    statNext.textContent = nextMileage.toLocaleString() + ' km';
+                    statNext.className = (nextMileage < parseInt(car.mileage)) ? "font-black text-red-500 text-xl" : "font-black text-slate-800 text-xl";
+                } else { statNext.textContent = '-'; }
+            }
 
             // Score Confiance LuxUI
             let score = 20; 
             if (car.vin) score += 20;
             score += Math.min(carLogs.length * 5, 30);
             score += Math.min(carLogs.filter(l => l.hasProof).length * 10, 30);
-            el('trust-score-text').textContent = score + "%";
-            el('trust-score-circle').style.strokeDashoffset = 176 - (176 * score) / 100;
             
-            const icon = el('trust-score-icon');
-            if (score > 70) { el('trust-score-circle').style.color = "#22c55e"; icon.style.color = "#22c55e"; }
-            else if (score > 40) { el('trust-score-circle').style.color = "#f59e0b"; icon.style.color = "#f59e0b"; }
-            else { el('trust-score-circle').style.color = "#ef4444"; icon.style.color = "#ef4444"; }
+            const scoreText = el('trust-score-text');
+            const scoreCircle = el('trust-score-circle');
+            const scoreIcon = el('trust-score-icon');
+            
+            if (scoreText) scoreText.textContent = score + "%";
+            if (scoreCircle) scoreCircle.style.strokeDashoffset = 176 - (176 * score) / 100;
+            
+            if (scoreCircle && scoreIcon) {
+                if (score > 70) { scoreCircle.style.color = "#22c55e"; scoreIcon.style.color = "#22c55e"; }
+                else if (score > 40) { scoreCircle.style.color = "#f59e0b"; scoreIcon.style.color = "#f59e0b"; }
+                else { scoreCircle.style.color = "#ef4444"; scoreIcon.style.color = "#ef4444"; }
+            }
 
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
             checkAlerts(carLogs);
         }
 
@@ -494,18 +580,26 @@
             renderAll();
         }
 
-        function toggleModal(id, show) { el(id).classList.toggle('active', show); }
+        function toggleModal(id, show) { 
+            const m = el(id);
+            if (m) m.classList.toggle('active', show); 
+        }
 
         function switchView(viewId) {
-            el('view-dashboard').classList.toggle('hidden', viewId !== 'view-dashboard');
-            el('view-buyer').classList.toggle('hidden', viewId !== 'view-buyer');
+            const dashboard = el('view-dashboard');
+            const buyer = el('view-buyer');
+            if (dashboard) dashboard.classList.toggle('hidden', viewId !== 'view-dashboard');
+            if (buyer) buyer.classList.toggle('hidden', viewId !== 'view-buyer');
+            
             document.querySelectorAll('.nav-btn').forEach(b => {
                 b.classList.remove('text-blue-400', 'bg-white/5');
                 b.classList.add('text-slate-500');
             });
-            const activeNav = viewId === 'view-dashboard' ? el('nav-dashboard') : el('nav-buyer');
-            activeNav.classList.add('text-blue-400', 'bg-white/5');
-            activeNav.classList.remove('text-slate-500');
+            const activeNav = el(viewId === 'view-dashboard' ? 'nav-dashboard' : 'nav-buyer');
+            if (activeNav) {
+                activeNav.classList.add('text-blue-400', 'bg-white/5');
+                activeNav.classList.remove('text-slate-500');
+            }
         }
 
         function setFilter(filter, btn) {
@@ -514,97 +608,184 @@
                 b.classList.remove('active', 'bg-slate-900', 'text-white', 'shadow-xl');
                 b.classList.add('text-slate-500');
             });
-            btn.classList.add('active', 'bg-slate-900', 'text-white', 'shadow-xl');
-            btn.classList.remove('text-slate-500');
+            if (btn) {
+                btn.classList.add('active', 'bg-slate-900', 'text-white', 'shadow-xl');
+                btn.classList.remove('text-slate-500');
+            }
             renderAll();
         }
 
-        el('form-log').onsubmit = (e) => {
-            e.preventDefault();
-            const id = el('log-id').value || Date.now().toString();
-            const newLog = {
-                id,
-                type: el('log-type').value,
-                date: el('log-date').value,
-                title: el('log-title').value,
-                mileage: el('log-mileage').value,
-                cost: parseFloat(el('log-cost').value) || 0,
-                isCertified: el('log-certified').checked,
-                provider: el('log-provider').value,
-                providerPhone: el('log-provider-phone').value,
-                expiryDate: el('log-expiry').value,
-                hasProof: el('log-file').files.length > 0 || (el('log-id').value && logsByCar[currentVehicleId].find(l => l.id === id).hasProof),
-                proofFileName: el('log-file').files[0]?.name || (el('log-id').value ? logsByCar[currentVehicleId].find(l => l.id === id).proofFileName : null)
+        // --- GESTIONNAIRE FORMULAIRE INTERVENTION ---
+        const formLog = el('form-log');
+        if (formLog) {
+            formLog.onsubmit = (e) => {
+                e.preventDefault();
+                
+                const carLogs = logsByCar[currentVehicleId] || [];
+                const logIdInput = el('log-id');
+                const logIdVal = logIdInput ? logIdInput.value : '';
+                const id = logIdVal || Date.now().toString();
+                
+                // On cherche l'entrée existante si on modifie
+                const existingLog = logIdVal ? carLogs.find(l => l.id === logIdVal) : null;
+                
+                const fileInput = el('log-file');
+                const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+                const newFileName = hasFile ? fileInput.files[0].name : null;
+
+                const newLog = {
+                    id,
+                    type: el('log-type')?.value || 'maintenance',
+                    date: el('log-date')?.value || new Date().toISOString().split('T')[0],
+                    title: el('log-title')?.value || '',
+                    mileage: parseInt(el('log-mileage')?.value) || 0,
+                    cost: parseFloat(el('log-cost')?.value) || 0,
+                    isCertified: el('log-certified')?.checked || false,
+                    provider: el('log-provider')?.value || '',
+                    providerPhone: el('log-provider-phone')?.value || '',
+                    expiryDate: el('log-expiry')?.value || null,
+                    hasProof: hasFile || (existingLog ? existingLog.hasProof : false),
+                    proofFileName: newFileName || (existingLog ? existingLog.proofFileName : null)
+                };
+
+                if (!logsByCar[currentVehicleId]) logsByCar[currentVehicleId] = [];
+                const idx = logsByCar[currentVehicleId].findIndex(l => l.id === id);
+                if (idx > -1) logsByCar[currentVehicleId][idx] = newLog;
+                else logsByCar[currentVehicleId].push(newLog);
+
+                const car = vehicles.find(v => v.id === currentVehicleId);
+                if (car && parseInt(newLog.mileage) > parseInt(car.mileage)) car.mileage = newLog.mileage.toString();
+
+                toggleModal('modal-log', false);
+                saveToLocal();
             };
-            if (!logsByCar[currentVehicleId]) logsByCar[currentVehicleId] = [];
-            const idx = logsByCar[currentVehicleId].findIndex(l => l.id === id);
-            if (idx > -1) logsByCar[currentVehicleId][idx] = newLog;
-            else logsByCar[currentVehicleId].push(newLog);
-            const car = vehicles.find(v => v.id === currentVehicleId);
-            if (parseInt(newLog.mileage) > parseInt(car.mileage)) car.mileage = newLog.mileage;
-            toggleModal('modal-log', false);
-            saveToLocal();
-        };
+        }
 
         window.editLog = (id) => {
-            const log = logsByCar[currentVehicleId].find(l => l.id === id);
-            el('log-id').value = log.id; el('log-type').value = log.type; el('log-date').value = log.date;
-            el('log-title').value = log.title; el('log-mileage').value = log.mileage; el('log-cost').value = log.cost;
-            el('log-certified').checked = log.isCertified; el('log-provider').value = log.provider || '';
-            el('log-provider-phone').value = log.providerPhone || ''; el('log-expiry').value = log.expiryDate || '';
-            toggleExpiryField(); toggleProDetails();
-            el('file-name').textContent = log.proofFileName || "Attacher une facture";
+            const log = (logsByCar[currentVehicleId] || []).find(l => l.id === id);
+            if (!log) return;
+            
+            const logId = el('log-id'); if (logId) logId.value = log.id;
+            const logType = el('log-type'); if (logType) logType.value = log.type;
+            const logDate = el('log-date'); if (logDate) logDate.value = log.date;
+            const logTitle = el('log-title'); 
+            if (logTitle) logTitle.value = log.title;
+            
+            const logMileage = el('log-mileage'); if (logMileage) logMileage.value = log.mileage;
+            const logCost = el('log-cost'); if (logCost) logCost.value = log.cost;
+            const logCertified = el('log-certified'); if (logCertified) logCertified.checked = log.isCertified;
+            const logProvider = el('log-provider'); if (logProvider) logProvider.value = log.provider || '';
+            const logPhone = el('log-provider-phone'); if (logPhone) logPhone.value = log.providerPhone || '';
+            const logExpiry = el('log-expiry'); if (logExpiry) logExpiry.value = log.expiryDate || '';
+            
+            toggleExpiryField(); 
+            toggleProDetails();
+            
+            const fileName = el('file-name');
+            if (fileName) fileName.textContent = log.proofFileName || "Attacher une facture";
+            
             toggleModal('modal-log', true);
-            el('modal-log-title').textContent = "Modifier l'entrée";
+            const modalTitle = el('modal-log-title');
+            if (modalTitle) modalTitle.textContent = "Modifier l'entrée";
         };
 
-        window.deleteLog = (id) => { if(confirm("Supprimer cette opération définitivement ?")) { logsByCar[currentVehicleId] = logsByCar[currentVehicleId].filter(l => l.id !== id); saveToLocal(); } };
+        window.deleteLog = (id) => { 
+            if(confirm("Supprimer cette opération définitivement ?")) { 
+                logsByCar[currentVehicleId] = (logsByCar[currentVehicleId] || []).filter(l => l.id !== id); 
+                saveToLocal(); 
+            } 
+        };
 
-        el('form-profile').onsubmit = (e) => {
-            e.preventDefault();
-            const id = el('prof-id').value || Date.now().toString();
-            const newCar = {
-                id, owner: el('prof-owner').value, ownerContact: el('prof-contact').value,
-                make: el('prof-make').value, model: el('prof-model').value, year: el('prof-year').value,
-                mileage: el('prof-mileage').value, plate: el('prof-plate').value, vin: el('prof-vin').value
+        const formProfile = el('form-profile');
+        if (formProfile) {
+            formProfile.onsubmit = (e) => {
+                e.preventDefault();
+                const profId = el('prof-id');
+                const id = (profId && profId.value) ? profId.value : Date.now().toString();
+                const newCar = {
+                    id, 
+                    owner: el('prof-owner')?.value || '', 
+                    ownerContact: el('prof-contact')?.value || '',
+                    make: el('prof-make')?.value || '', 
+                    model: el('prof-model')?.value || '', 
+                    year: el('prof-year')?.value || '',
+                    mileage: el('prof-mileage')?.value || '0', 
+                    plate: el('prof-plate')?.value || '', 
+                    vin: el('prof-vin')?.value || ''
+                };
+                const idx = vehicles.findIndex(v => v.id === id);
+                if (idx > -1) vehicles[idx] = newCar;
+                else { 
+                    vehicles.push(newCar); 
+                    currentVehicleId = id; 
+                    localStorage.setItem('autocarnet_v4_currentId', id); 
+                }
+                toggleModal('modal-profile', false);
+                init();
+                saveToLocal();
             };
-            const idx = vehicles.findIndex(v => v.id === id);
-            if (idx > -1) vehicles[idx] = newCar;
-            else { vehicles.push(newCar); currentVehicleId = id; localStorage.setItem('autocarnet_v4_currentId', id); }
-            toggleModal('modal-profile', false);
-            init();
-            saveToLocal();
-        };
+        }
 
         window.openProfileModal = (car = null) => {
-            el('form-profile').reset();
+            const form = el('form-profile');
+            if (form) form.reset();
+            const modalTitle = el('modal-profile-title');
+            
             if (car) {
-                el('prof-id').value = car.id; el('prof-owner').value = car.owner;
-                el('prof-contact').value = car.ownerContact; el('prof-make').value = car.make;
-                el('prof-model').value = car.model; el('prof-year').value = car.year;
-                el('prof-mileage').value = car.mileage; el('prof-plate').value = car.plate;
-                el('prof-vin').value = car.vin || '';
-                el('modal-profile-title').textContent = "Modifier Véhicule";
-            } else { el('modal-profile-title').textContent = "Configuration"; }
+                if (el('prof-id')) el('prof-id').value = car.id; 
+                if (el('prof-owner')) el('prof-owner').value = car.owner;
+                if (el('prof-contact')) el('prof-contact').value = car.ownerContact; 
+                if (el('prof-make')) el('prof-make').value = car.make;
+                if (el('prof-model')) el('prof-model').value = car.model; 
+                if (el('prof-year')) el('prof-year').value = car.year;
+                if (el('prof-mileage')) el('prof-mileage').value = car.mileage; 
+                if (el('prof-plate')) el('prof-plate').value = car.plate;
+                if (el('prof-vin')) el('prof-vin').value = car.vin || '';
+                if (modalTitle) modalTitle.textContent = "Modifier Véhicule";
+            } else { 
+                if (modalTitle) modalTitle.textContent = "Configuration"; 
+            }
             toggleModal('modal-profile', true);
         };
 
         window.openLogModal = () => {
-            el('form-log').reset(); el('log-id').value = ''; el('log-date').value = new Date().toISOString().split('T')[0];
-            el('file-name').textContent = "Attacher une facture"; toggleExpiryField(); toggleProDetails();
-            toggleModal('modal-log', true); el('modal-log-title').textContent = "Nouvelle Entrée";
+            const form = el('form-log');
+            if (form) form.reset();
+            const idInput = el('log-id'); if (idInput) idInput.value = '';
+            const dateInput = el('log-date'); if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+            const fileName = el('file-name'); if (fileName) fileName.textContent = "Attacher une facture";
+            
+            toggleExpiryField(); 
+            toggleProDetails();
+            toggleModal('modal-log', true); 
+            const modalTitle = el('modal-log-title');
+            if (modalTitle) modalTitle.textContent = "Nouvelle Entrée";
         };
 
-        window.toggleExpiryField = () => el('expiry-field').classList.toggle('hidden', el('log-type').value !== 'admin');
-        window.toggleProDetails = () => el('pro-details').classList.toggle('hidden', !el('log-certified').checked);
+        window.toggleExpiryField = () => {
+            const type = el('log-type');
+            const field = el('expiry-field');
+            if (field && type) field.classList.toggle('hidden', type.value !== 'admin');
+        };
+        
+        window.toggleProDetails = () => {
+            const cert = el('log-certified');
+            const details = el('pro-details');
+            if (details && cert) details.classList.toggle('hidden', !cert.checked);
+        };
+        
         window.handleFileChange = () => {
-            const name = el('log-file').files[0]?.name || "Attacher une facture";
-            el('file-name').textContent = name;
-            el('file-icon').className = "w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30";
+            const input = el('log-file');
+            const name = (input && input.files && input.files[0]) ? input.files[0].name : "Attacher une facture";
+            const fileName = el('file-name'); if (fileName) fileName.textContent = name;
+            const icon = el('file-icon');
+            if (icon) icon.className = "w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30";
         };
 
         function checkAlerts(carLogs) {
-            const container = el('alerts-container'); container.innerHTML = '';
+            const container = el('alerts-container'); 
+            if (!container) return;
+            container.innerHTML = '';
             const now = new Date();
             carLogs.forEach(log => {
                 if (log.expiryDate) {
@@ -618,10 +799,11 @@
                     }
                 }
             });
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
-        init();
+        // Initialisation après chargement
+        window.onload = init;
     </script>
 </body>
 </html>
