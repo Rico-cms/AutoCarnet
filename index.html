@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCarnet - Expérience Premium</title>
+    <title>AutoCarnet LuxUI - Gestion Premium</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -25,19 +28,20 @@
             .print-break-inside-avoid { page-break-inside: avoid; }
         }
 
-        /* Animations de chargement */
+        /* Animations LuxUI */
         .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
         
         @keyframes fadeIn { to { opacity: 1; } }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
+        /* Timeline Design LuxUI */
         .timeline-line::before {
             content: '';
             position: absolute;
             top: 0; bottom: 0; left: 1.25rem;
             width: 2px;
-            background: linear-gradient(to bottom, transparent, #e2e8f0, transparent);
+            background: linear-gradient(to bottom, #f1f5f9, #e2e8f0, #f1f5f9);
         }
         @media (min-width: 768px) {
             .timeline-line::before {
@@ -46,65 +50,56 @@
             }
         }
 
-        /* Classes utilitaires pour les transitions de modales */
-        .modal-container { visibility: hidden; pointer-events: none; z-index: 50; }
+        /* Modals Glassmorphism */
+        .modal-container { visibility: hidden; pointer-events: none; z-index: 100; transition: all 0.3s; }
         .modal-container.active { visibility: visible; pointer-events: auto; }
-        
-        .modal-backdrop { opacity: 0; transition: opacity 0.3s ease-out; }
+        .modal-backdrop { opacity: 0; transition: opacity 0.4s ease-out; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); }
         .modal-container.active .modal-backdrop { opacity: 1; }
-
-        .modal-content { 
-            transform: translateY(100%); 
-            opacity: 0; 
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
-        }
-        .modal-container.active .modal-content { 
-            transform: translateY(0); 
-            opacity: 1; 
-        }
+        .modal-content { transform: translateY(100%); opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-container.active .modal-content { transform: translateY(0); opacity: 1; }
 
         @media (min-width: 640px) {
-            .modal-content { 
-                transform: scale(0.95) translateY(10px); 
-                opacity: 0;
-            }
-            .modal-container.active .modal-content { 
-                transform: scale(1) translateY(0); 
-                opacity: 1; 
-            }
+            .modal-content { transform: scale(0.9) translateY(20px); opacity: 0; }
+            .modal-container.active .modal-content { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* Custom Card Gradients */
+        .card-lux {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 pb-28 md:pb-10 selection:bg-blue-100 selection:text-blue-900 antialiased">
+<body class="bg-slate-50 text-slate-900 pb-32 md:pb-10 selection:bg-blue-100 selection:text-blue-900 antialiased">
 
-    <!-- HEADER -->
-    <header class="bg-slate-900 text-white pt-6 pb-24 px-6 sticky top-0 z-10 shadow-lg no-print transition-all duration-300">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-                <div class="relative">
-                    <div class="absolute inset-0 bg-green-400 blur-sm opacity-20 rounded-full"></div>
-                    <i data-lucide="shield-check" class="text-green-400 w-8 h-8 relative z-10"></i>
+    <!-- HEADER LUX -->
+    <header class="bg-slate-900 text-white pt-8 pb-28 px-6 sticky top-0 z-10 no-print overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6 relative z-10">
+            <div class="flex items-center gap-4 w-full sm:w-auto">
+                <div class="bg-green-400/20 p-2.5 rounded-2xl shadow-inner">
+                    <i data-lucide="shield-check" class="text-green-400 w-8 h-8"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight">AutoCarnet</h1>
-                    <p class="text-slate-400 text-xs font-medium tracking-wide">Gestion de Flotte & Historique</p>
+                    <h1 class="text-2xl font-black tracking-tight leading-none">AutoCarnet</h1>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1 opacity-80">Espace Premium</p>
                 </div>
             </div>
 
-            <!-- Vehicle Selector -->
-            <div id="vehicle-selector-container" class="hidden w-full sm:w-auto flex items-center gap-2 bg-slate-800/50 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/50 shadow-inner">
-                <div class="relative flex-1 sm:w-48">
-                    <select id="vehicle-select" class="bg-transparent text-white text-sm font-bold py-2 pl-3 pr-8 outline-none cursor-pointer w-full appearance-none relative z-10">
-                        <!-- Options injected via JS -->
+            <!-- Vehicle Selector Lux -->
+            <div id="vehicle-selector-container" class="hidden w-full sm:w-auto flex items-center gap-2 bg-white/10 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-2xl">
+                <div class="relative flex-1 sm:w-56">
+                    <select id="vehicle-select" class="bg-transparent text-white text-sm font-bold py-2 pl-4 pr-10 outline-none cursor-pointer w-full appearance-none relative z-10">
+                        <!-- JS inject -->
                     </select>
-                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 z-0"></i>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-white/50 absolute right-3 top-1/2 -translate-y-1/2"></i>
                 </div>
-                <div class="w-px h-6 bg-slate-700 mx-1"></div>
-                <button id="btn-add-car-header" class="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition shadow-lg shadow-blue-900/20 active:scale-95" title="Ajouter un véhicule">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
+                <div class="w-px h-8 bg-white/10 mx-1"></div>
+                <button id="btn-add-car-header" class="p-2.5 bg-blue-600 hover:bg-blue-500 rounded-xl transition-all active:scale-90 shadow-lg shadow-blue-600/20">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
                 </button>
-                <button id="btn-edit-car-header" class="p-2 hover:bg-slate-700 rounded-lg transition active:scale-95" title="Modifier ce véhicule">
-                    <i data-lucide="settings-2" class="w-4 h-4 text-slate-300"></i>
+                <button id="btn-edit-car-header" class="p-2.5 hover:bg-white/10 rounded-xl transition-all active:scale-90 text-white/70">
+                    <i data-lucide="settings-2" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
@@ -113,573 +108,512 @@
     <!-- MAIN CONTENT -->
     <main class="max-w-4xl mx-auto px-4 -mt-16 relative z-20 space-y-6">
         
-        <!-- LOADING -->
-        <div id="loading-state" class="text-center py-20 text-slate-500 flex flex-col items-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-500 mb-4"></div>
-            <span class="text-sm font-medium animate-pulse">Chargement de vos données...</span>
-        </div>
-
-        <!-- ONBOARDING (Zero Vehicles) -->
-        <div id="onboarding-state" class="hidden flex flex-col items-center justify-center min-h-[50vh] text-center fade-in pt-10">
-            <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 p-8 rounded-[2rem] mb-8 shadow-2xl shadow-blue-200 ring-8 ring-white transform transition hover:scale-105 duration-500">
-                <i data-lucide="car-front" class="w-20 h-20 text-white"></i>
+        <!-- ONBOARDING LUX -->
+        <div id="onboarding-state" class="hidden flex flex-col items-center justify-center min-h-[50vh] text-center fade-in pt-12">
+            <div class="bg-white p-10 rounded-[3rem] shadow-2xl shadow-slate-200/50 mb-8 transform transition hover:scale-105 duration-500 border border-slate-100">
+                <i data-lucide="car-front" class="w-24 h-24 text-blue-600"></i>
             </div>
-            <h1 class="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Bienvenue sur AutoCarnet</h1>
-            <p class="text-slate-500 mb-10 max-w-sm text-lg leading-relaxed">
-                Centralisez l'entretien de vos véhicules et valorisez votre patrimoine automobile.
+            <h1 class="text-4xl font-black text-slate-900 mb-4 tracking-tight">Prêt à commencer ?</h1>
+            <p class="text-slate-500 mb-10 max-w-sm text-lg font-medium leading-relaxed">
+                Gardez une trace précieuse de chaque intervention pour valoriser votre véhicule.
             </p>
-            <button id="btn-start-onboarding" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 flex items-center gap-3 text-lg">
-                <i data-lucide="plus-circle" class="w-6 h-6"></i> Ajouter mon premier véhicule
+            <button onclick="openProfileModal()" class="bg-slate-900 text-white px-10 py-5 rounded-[2rem] font-extrabold hover:bg-blue-600 transition-all shadow-2xl shadow-blue-500/20 hover:-translate-y-1 active:translate-y-0 flex items-center gap-4 text-xl group">
+                <i data-lucide="plus-circle" class="w-7 h-7 group-hover:rotate-90 transition-transform"></i> Ajouter mon véhicule
             </button>
         </div>
 
         <!-- APP CONTENT -->
-        <div id="app-content" class="hidden space-y-6 fade-in">
+        <div id="app-content" class="hidden space-y-8 fade-in">
             
-            <div id="alerts-container" class="space-y-3 no-print"></div>
+            <div id="alerts-container" class="space-y-4 no-print"></div>
 
-            <!-- DASHBOARD CARD -->
-            <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/60 overflow-hidden print:shadow-none print:border print:border-slate-300 border border-white/50">
-                <div class="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 bg-white relative overflow-hidden">
-                    <!-- Background decoration -->
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
-                    
+            <!-- DASHBOARD CARD LUX -->
+            <div class="card-lux rounded-[2.5rem] shadow-2xl shadow-slate-200/60 overflow-hidden print:border print:border-slate-300 transition-all duration-500 hover:shadow-blue-500/5 group">
+                <div class="p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-8 relative overflow-hidden">
                     <div class="relative z-10">
-                        <div class="flex items-center gap-3 mb-2">
-                            <h2 id="car-title" class="text-3xl font-black text-slate-800 tracking-tight">--</h2>
-                            <span id="car-year" class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-md font-mono border border-slate-200">--</span>
+                        <div class="flex items-center gap-4 mb-3">
+                            <h2 id="car-title" class="text-4xl font-black text-slate-800 tracking-tight">--</h2>
+                            <span id="car-year" class="bg-blue-50 text-blue-600 text-xs font-black px-3 py-1.5 rounded-xl border border-blue-100/50">--</span>
                         </div>
-                        <div class="flex flex-wrap gap-3 text-sm font-medium text-slate-500">
-                            <span class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                                <i data-lucide="gauge" class="w-4 h-4 text-slate-400"></i>
-                                <span id="car-mileage" class="text-slate-700">-- km</span>
+                        <div class="flex flex-wrap gap-4">
+                            <span class="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm text-slate-600 font-bold">
+                                <i data-lucide="gauge" class="w-4 h-4 text-blue-500"></i>
+                                <span id="car-mileage">-- km</span>
                             </span>
-                            <span class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 font-mono">
-                                <i data-lucide="credit-card" class="w-4 h-4 text-slate-400"></i>
-                                <span id="car-plate" class="text-slate-700">--</span>
+                            <span class="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm font-mono font-bold text-slate-600">
+                                <i data-lucide="hash" class="w-4 h-4 text-blue-500"></i>
+                                <span id="car-plate">--</span>
                             </span>
-                            <span class="flex items-center gap-1.5 bg-blue-50/50 px-3 py-1.5 rounded-lg border border-blue-100/50">
-                                <i data-lucide="user" class="w-4 h-4 text-blue-500"></i>
-                                <span id="car-owner" class="text-blue-700 font-semibold">--</span>
+                            <span class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-2xl shadow-lg shadow-blue-500/20 font-bold">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                                <span id="car-owner">--</span>
                             </span>
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-4 relative z-10 bg-slate-50/80 p-3 rounded-2xl border border-slate-100 backdrop-blur-sm">
+                    <div class="flex items-center gap-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm relative z-10">
                         <div class="text-right hidden sm:block">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Score Confiance</div>
-                            <div id="trust-score-text" class="font-black text-2xl text-slate-400 leading-none mt-0.5">0%</div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Confiance</div>
+                            <div id="trust-score-text" class="font-black text-3xl text-slate-400 leading-none mt-1">0%</div>
                         </div>
-                        <div class="relative w-14 h-14 flex items-center justify-center">
+                        <div class="relative w-16 h-16 flex items-center justify-center">
                             <svg class="w-full h-full transform -rotate-90">
-                                <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="5" fill="transparent" class="text-slate-200" />
-                                <circle id="trust-score-circle" cx="28" cy="28" r="24" stroke="currentColor" stroke-width="5" fill="transparent" stroke-dasharray="150" stroke-dashoffset="150" stroke-linecap="round" class="text-blue-500 transition-all duration-1000 ease-out" />
+                                <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent" class="text-slate-100" />
+                                <circle id="trust-score-circle" cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent" stroke-dasharray="176" stroke-dashoffset="176" stroke-linecap="round" class="text-blue-500 transition-all duration-1000 ease-out" />
                             </svg>
-                            <i id="trust-score-icon" data-lucide="award" class="w-6 h-6 absolute text-slate-300 transition-colors duration-500"></i>
+                            <i id="trust-score-icon" data-lucide="shield-check" class="w-8 h-8 absolute text-slate-200 transition-colors duration-500"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-slate-50/50">
-                    <div class="p-4 text-center hover:bg-white transition-colors">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Total Investi</div>
-                        <div id="stat-invest" class="font-bold text-slate-800 text-lg">0 FCFA</div>
+                <div class="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-white/50 backdrop-blur-sm">
+                    <div class="p-6 text-center group/stat transition-colors hover:bg-white">
+                        <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-2">Investi</div>
+                        <div id="stat-invest" class="font-black text-slate-800 text-xl tracking-tight">0 FCFA</div>
                     </div>
-                    <div class="p-4 text-center hover:bg-white transition-colors">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Entrées</div>
-                        <div id="stat-logs" class="font-bold text-slate-800 text-lg">0</div>
+                    <div class="p-6 text-center group/stat transition-colors hover:bg-white">
+                        <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-2">Opérations</div>
+                        <div id="stat-logs" class="font-black text-slate-800 text-xl tracking-tight">0</div>
                     </div>
-                    <div class="p-4 text-center hover:bg-white transition-colors">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Prochain Service</div>
-                        <div id="stat-next-service" class="font-bold text-slate-800 text-lg">-</div>
+                    <div class="p-6 text-center group/stat transition-colors hover:bg-white">
+                        <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-2">Prochaine Échéance</div>
+                        <div id="stat-next-service" class="font-black text-slate-800 text-xl tracking-tight">-</div>
                     </div>
                 </div>
             </div>
 
-            <!-- TABS -->
-            <div id="view-dashboard" class="space-y-6 no-print">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-1">
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        Historique
-                        <span class="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full" id="logs-count-badge">0</span>
+            <!-- TIMELINE LUX -->
+            <div id="view-dashboard" class="space-y-8 no-print pt-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 px-2">
+                    <h3 class="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                        Journal de bord
+                        <span class="text-sm font-bold bg-slate-200 text-slate-600 px-3 py-1 rounded-full" id="logs-count-badge">0</span>
                     </h3>
-                    <div class="flex gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 no-scrollbar p-0.5">
-                        <button data-filter="all" class="filter-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-slate-800 text-white shadow-lg shadow-slate-200 scale-100">Tout</button>
-                        <button data-filter="maintenance" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-white text-slate-600 border border-slate-200 hover:border-blue-200 hover:text-blue-600">Entretien</button>
-                        <button data-filter="admin" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-white text-slate-600 border border-slate-200 hover:border-purple-200 hover:text-purple-600">Papiers</button>
+                    <div class="flex gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto no-scrollbar w-full sm:w-auto">
+                        <button onclick="setFilter('all', this)" class="filter-btn active px-6 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all bg-slate-900 text-white shadow-xl">Tous</button>
+                        <button onclick="setFilter('maintenance', this)" class="filter-btn px-6 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all text-slate-500 hover:text-blue-600">Entretien</button>
+                        <button onclick="setFilter('admin', this)" class="filter-btn px-6 py-2.5 rounded-xl text-xs font-black whitespace-nowrap transition-all text-slate-500 hover:text-purple-600">Papiers</button>
                     </div>
                 </div>
-
-                <button id="btn-add-log-mobile" class="w-full sm:hidden py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold border border-blue-100 flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition">
-                    <i data-lucide="plus-circle" class="w-5 h-5"></i> Ajouter une intervention
-                </button>
-
-                <div id="timeline-container" class="space-y-6 relative timeline-line pb-12"></div>
+                <div id="timeline-container" class="space-y-8 relative timeline-line pb-12"></div>
             </div>
 
-            <!-- VIEW: CERTIFICATE -->
-            <div id="view-buyer" class="hidden space-y-6 slide-up">
-                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 rounded-3xl shadow-2xl text-center print:border print:border-slate-800 print:text-black print:bg-none relative overflow-hidden">
-                    <!-- Deco -->
-                    <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
-                    
+            <!-- CERTIFICATE LUX (VENTE) -->
+            <div id="view-buyer" class="hidden space-y-8 slide-up">
+                <div class="bg-slate-900 text-white p-10 rounded-[3rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] text-center print:border print:border-slate-800 print:text-black print:bg-none relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-blue-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
                     <div class="relative z-10">
-                        <div class="bg-white/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 backdrop-blur-md ring-1 ring-white/20 print:hidden shadow-lg">
+                        <div class="w-20 h-20 bg-green-400/20 rounded-full flex items-center justify-center mx-auto mb-6">
                             <i data-lucide="shield-check" class="w-10 h-10 text-green-400"></i>
                         </div>
-                        <h2 class="text-2xl font-bold mb-2">Certificat de Transparence</h2>
-                        <p class="text-slate-400 max-w-md mx-auto text-sm mb-8 print:text-slate-600 leading-relaxed">
-                            Ce document atteste de l'historique d'entretien du véhicule tel que déclaré et documenté par son propriétaire.
-                        </p>
-                        
-                        <div class="grid grid-cols-2 gap-4 text-left print:grid-cols-2">
-                            <div class="bg-white/5 p-5 rounded-2xl backdrop-blur-sm border border-white/10 print:border print:border-slate-300">
-                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Propriétaire</div>
-                                <div id="cert-owner" class="font-bold text-lg tracking-tight">--</div>
+                        <h2 class="text-3xl font-black mb-2 tracking-tight">Certificat de Transparence</h2>
+                        <p class="text-slate-400 text-sm mb-10 leading-relaxed font-medium">Historique d'entretien vérifié par AutoCarnet LuxUI.</p>
+                        <div class="grid grid-cols-2 gap-6 text-left max-w-2xl mx-auto">
+                            <div class="bg-white/5 p-6 rounded-3xl border border-white/10 print:border-slate-300">
+                                <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-2">Propriétaire</div>
+                                <div id="cert-owner" class="font-black text-xl tracking-tight">--</div>
                             </div>
-                            <div class="bg-white/5 p-5 rounded-2xl backdrop-blur-sm border border-white/10 print:border print:border-slate-300">
-                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Véhicule</div>
-                                <div id="cert-car" class="font-bold text-lg tracking-tight">--</div>
-                                <div id="cert-vin" class="text-xs font-mono text-slate-400 mt-1 opacity-80">VIN: --</div>
+                            <div class="bg-white/5 p-6 rounded-3xl border border-white/10 print:border-slate-300">
+                                <div class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-2">Véhicule</div>
+                                <div id="cert-car" class="font-black text-xl tracking-tight">--</div>
+                                <div id="cert-vin" class="text-[10px] font-mono text-slate-400 mt-2 uppercase opacity-60 tracking-wider font-bold">--</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="flex justify-between items-center px-2 no-print">
-                    <h3 class="text-lg font-bold text-slate-800">Opérations détaillées</h3>
-                    <button onclick="window.print()" class="flex items-center gap-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition shadow-sm">
-                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimer le PDF
-                    </button>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print:border-0">
+                
+                <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-slate-50 text-slate-500 border-b border-slate-100">
+                        <thead class="bg-slate-50/50 border-b border-slate-100">
                             <tr>
-                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Date</th>
-                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Opération</th>
-                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-right">Km</th>
-                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Preuve</th>
+                                <th class="px-8 py-5 font-black uppercase text-[10px] text-slate-400 tracking-widest">Date</th>
+                                <th class="px-8 py-5 font-black uppercase text-[10px] text-slate-400 tracking-widest">Opération</th>
+                                <th class="px-8 py-5 font-black uppercase text-[10px] text-slate-400 tracking-widest text-right">Km</th>
+                                <th class="px-8 py-5 font-black uppercase text-[10px] text-slate-400 tracking-widest text-center">Preuve</th>
                             </tr>
                         </thead>
-                        <tbody id="cert-table-body" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="cert-table-body" class="divide-y divide-slate-50 font-medium"></tbody>
                     </table>
                 </div>
+                <button onclick="window.print()" class="w-full py-6 bg-slate-900 text-white font-black rounded-[2rem] flex items-center justify-center gap-3 no-print active:scale-95 transition shadow-2xl shadow-slate-900/20 text-lg">
+                    <i data-lucide="printer" class="w-6 h-6"></i> Générer le dossier de vente
+                </button>
             </div>
         </div>
     </main>
 
-    <!-- NAV BOTTOM -->
-    <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 px-6 py-2 pb-6 md:pb-2 z-40 flex justify-around items-center md:max-w-md md:mx-auto md:bottom-6 md:rounded-full md:shadow-2xl md:border md:ring-1 md:ring-slate-900/5 no-print">
-        <button id="nav-dashboard" class="flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50/80 w-16 transition-all duration-300">
-            <i data-lucide="history" class="w-6 h-6"></i> <span class="text-[10px] font-bold">Journal</span>
+    <!-- NAV BOTTOM LUX -->
+    <nav id="bottom-nav" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-slate-900/95 backdrop-blur-2xl border border-white/10 px-8 py-3 z-40 flex justify-between items-center rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] no-print">
+        <button onclick="switchView('view-dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1.5 p-3 rounded-2xl text-blue-400 bg-white/5 transition-all duration-300">
+            <i data-lucide="history" class="w-6 h-6"></i>
+            <span class="text-[10px] font-black uppercase tracking-widest">Journal</span>
         </button>
-        <button id="nav-add" class="flex flex-col items-center justify-center -mt-10 bg-slate-900 text-white w-14 h-14 rounded-2xl shadow-lg shadow-slate-400/50 hover:scale-105 active:scale-95 transition-all duration-300 ring-4 ring-white">
-            <i data-lucide="plus" class="w-8 h-8"></i>
+        <button onclick="openLogModal()" class="flex flex-col items-center justify-center -mt-16 bg-blue-600 text-white w-20 h-20 rounded-[2rem] shadow-2xl shadow-blue-600/40 active:scale-90 transition-all duration-300 ring-8 ring-slate-50">
+            <i data-lucide="plus" class="w-10 h-10"></i>
         </button>
-        <button id="nav-buyer" class="flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 w-16 transition-all duration-300 hover:text-slate-600">
-            <i data-lucide="share-2" class="w-6 h-6"></i> <span class="text-[10px] font-bold">Vente</span>
+        <button onclick="switchView('view-buyer')" id="nav-buyer" class="nav-btn flex flex-col items-center gap-1.5 p-3 rounded-2xl text-slate-500 transition-all duration-300 hover:text-white">
+            <i data-lucide="share-2" class="w-6 h-6"></i>
+            <span class="text-[10px] font-black uppercase tracking-widest">Vente</span>
         </button>
     </nav>
 
-    <!-- MODAL: ADD/EDIT LOG -->
-    <div id="modal-add-log" class="modal-container fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <!-- Backdrop -->
-        <div class="modal-backdrop absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleModal('modal-add-log', false)"></div>
-        
-        <!-- Content -->
-        <div class="modal-content relative bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center p-6 border-b border-slate-100 sticky top-0 bg-white rounded-t-2xl z-10">
-                <h2 id="modal-log-title" class="text-xl font-bold text-slate-800 flex items-center gap-2"></h2>
-                <button onclick="toggleModal('modal-add-log', false)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <!-- MODAL LUX: LOG -->
+    <div id="modal-log" class="modal-container fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="modal-backdrop absolute inset-0" onclick="toggleModal('modal-log', false)"></div>
+        <div class="modal-content relative bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex flex-col max-h-[90vh] border border-slate-100">
+            <div class="flex justify-between items-center p-8 border-b border-slate-50">
+                <h2 id="modal-log-title" class="text-2xl font-black text-slate-800 tracking-tight">Nouvelle Entrée</h2>
+                <button onclick="toggleModal('modal-log', false)" class="p-3 bg-slate-100 rounded-2xl text-slate-500 active:scale-90 transition-transform"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
-            
-            <form id="form-add-log" class="space-y-5 overflow-y-auto p-6 scroll-smooth">
+            <form id="form-log" class="p-8 space-y-6 overflow-y-auto">
                 <input type="hidden" id="log-id">
-                
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Type</label>
-                        <div class="relative">
-                            <select id="log-type" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium appearance-none transition-shadow">
-                                <option value="maintenance">Entretien</option>
-                                <option value="repair">Réparation</option>
-                                <option value="admin">Papiers</option>
-                                <option value="upgrade">Amélioration</option>
-                            </select>
-                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                        </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Catégorie</label>
+                        <select id="log-type" onchange="toggleExpiryField()" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold transition-all"><option value="maintenance">🛠️ Entretien</option><option value="repair">🔧 Réparation</option><option value="admin">📄 Papiers</option></select>
                     </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Date</label>
-                        <input type="date" id="log-date" required class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium transition-shadow">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Date</label>
+                        <input type="date" id="log-date" required class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold transition-all">
                     </div>
                 </div>
-                
-                <div id="expiry-field" class="hidden bg-purple-50 p-4 rounded-xl border border-purple-100 animate-in slide-in-from-top-2">
-                     <label class="block text-xs font-bold text-purple-700 uppercase mb-1.5 flex items-center gap-2"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Expiration (Validité)</label>
-                     <input type="date" id="log-expiry" class="w-full p-3 bg-white border border-purple-200 rounded-xl text-purple-900 focus:ring-2 focus:ring-purple-500/20 outline-none">
+                <div id="expiry-field" class="hidden bg-purple-50 p-6 rounded-3xl border border-purple-100 space-y-2 animate-in slide-in-from-top-2">
+                    <label class="text-[10px] font-black text-purple-700 uppercase tracking-widest">Date d'expiration</label>
+                    <input type="date" id="log-expiry" class="w-full p-4 bg-white border border-purple-200 rounded-2xl outline-none font-bold">
                 </div>
-
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Titre de l'opération</label>
-                    <input type="text" id="log-title" required list="service-suggestions" placeholder="Ex: Vidange 5W30, Changement Pneus..." class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium placeholder:font-normal transition-shadow">
-                    <datalist id="service-suggestions">
-                        <option value="Vidange Moteur + Filtres"></option><option value="Visite Technique"></option><option value="Renouvellement Assurance"></option><option value="Plaquettes de frein"></option>
-                    </datalist>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Désignation</label>
+                    <input type="text" id="log-title" required placeholder="Ex: Vidange 10W40 + Filtres" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold transition-all placeholder:text-slate-300">
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Km Compteur</label>
-                        <div class="relative">
-                            <input type="number" id="log-mileage" placeholder="120000" class="w-full p-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium transition-shadow">
-                            <i data-lucide="gauge" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                        </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Km actuel</label>
+                        <input type="number" id="log-mileage" required placeholder="0" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold">
                     </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Coût</label>
-                        <div class="relative">
-                            <input type="number" id="log-cost" placeholder="0" class="w-full p-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium transition-shadow">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">F</span>
-                        </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Montant (FCFA)</label>
+                        <input type="number" id="log-cost" placeholder="0" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold">
                     </div>
                 </div>
-
-                <!-- Proof Logic -->
-                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-                    <div class="flex items-center gap-3 border-b border-slate-200 pb-3">
-                        <div class="relative flex items-center">
-                            <input type="checkbox" id="log-certified" class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-slate-300 bg-white checked:border-blue-600 checked:bg-blue-600 transition-all">
-                            <i data-lucide="check" class="pointer-events-none absolute left-1/2 top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                        </div>
-                        <label for="log-certified" class="text-sm font-bold text-slate-700 cursor-pointer select-none flex-1">
-                            Effectué par un professionnel ?
-                        </label>
+                <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 space-y-5">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="log-certified" onchange="toggleProDetails()" class="w-6 h-6 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                        <label for="log-certified" class="text-sm font-black text-slate-700 cursor-pointer select-none">Réalisé par un Garage Pro</label>
                     </div>
-
-                    <div id="pro-details" class="hidden space-y-3 animate-in fade-in slide-in-from-top-2">
-                        <div class="bg-yellow-50 text-yellow-800 text-xs p-3 rounded-lg border border-yellow-100 flex gap-2 items-start">
-                            <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
-                            <span>Pour la certification, les coordonnées du garage sont requises.</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="log-provider" placeholder="Nom du Garage *" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none">
-                            <input type="tel" id="log-provider-phone" placeholder="Tél du Garage *" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none">
-                        </div>
+                    <div id="pro-details" class="hidden grid grid-cols-2 gap-3 animate-in fade-in">
+                        <input id="log-provider" placeholder="Nom du Garage" class="p-3 border border-slate-200 rounded-xl text-sm bg-white font-bold outline-none">
+                        <input id="log-provider-phone" placeholder="Tél du Garage" class="p-3 border border-slate-200 rounded-xl text-sm bg-white font-bold outline-none">
                     </div>
-
-                    <div class="relative group border-2 border-slate-200 border-dashed rounded-xl p-4 hover:bg-white hover:border-blue-400 transition-all cursor-pointer bg-white/50">
-                        <input type="file" id="log-file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
-                        <div class="flex items-center gap-4 relative z-10 pointer-events-none">
-                            <div id="file-icon" class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center transition-colors group-hover:bg-blue-50 group-hover:text-blue-500">
-                                <i data-lucide="camera" class="w-5 h-5"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="text-xs font-bold text-slate-500 uppercase tracking-wide group-hover:text-blue-600 transition-colors">Preuve (Facture/Reçu)</div>
-                                <div id="file-name" class="text-sm text-slate-800 font-medium truncate">Aucun fichier sélectionné</div>
-                            </div>
-                            <div class="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors">Parcourir</div>
+                    <div class="relative border-2 border-slate-200 border-dashed rounded-2xl p-4 hover:bg-white transition-all cursor-pointer flex items-center gap-4 group">
+                        <input type="file" id="log-file" onchange="handleFileChange()" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div id="file-icon" class="w-10 h-10 rounded-xl bg-white shadow-sm text-slate-400 flex items-center justify-center group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
+                            <i data-lucide="camera" class="w-5 h-5"></i>
                         </div>
+                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest truncate group-hover:text-blue-600 transition-colors" id="file-name">Attacher une facture</div>
                     </div>
                 </div>
-
-                <div class="pt-2">
-                    <button type="submit" class="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 shadow-lg shadow-slate-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2 text-lg">
-                        <i data-lucide="check-circle-2" class="w-5 h-5"></i> <span id="btn-save-text">Valider l'entrée</span>
-                    </button>
-                </div>
+                <button type="submit" class="w-full py-5 bg-slate-900 text-white font-black rounded-2xl active:scale-[0.98] transition-all text-xl shadow-2xl shadow-slate-900/20">Valider l'entrée</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: VEHICLE PROFILE (ADD/EDIT) -->
-    <div id="modal-profile" class="modal-container fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="modal-backdrop absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleModal('modal-profile', false)"></div>
-        <div class="modal-content relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center p-6 border-b border-slate-100">
-                <h2 id="modal-profile-title" class="text-xl font-bold text-slate-800">Ajouter un véhicule</h2>
-                <button onclick="toggleModal('modal-profile', false)" class="text-slate-400 hover:text-slate-600 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
-            </div>
-            <form id="form-profile" class="space-y-5 overflow-y-auto p-6">
+    <!-- MODAL LUX: VEHICLE -->
+    <div id="modal-profile" class="modal-container fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="modal-backdrop absolute inset-0" onclick="toggleModal('modal-profile', false)"></div>
+        <div class="modal-content relative bg-white w-full max-w-md rounded-t-[3rem] sm:rounded-[3rem] shadow-2xl p-8 border border-slate-100">
+            <h2 id="modal-profile-title" class="text-3xl font-black mb-8 tracking-tight">Configuration</h2>
+            <form id="form-profile" class="space-y-6">
                 <input type="hidden" id="prof-id">
-                
-                <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100 space-y-4">
-                    <div class="flex items-center gap-2 text-blue-800 text-xs font-bold uppercase tracking-wider">
-                        <i data-lucide="user-check" class="w-4 h-4"></i> Propriétaire
-                    </div>
-                    <div class="space-y-3">
-                        <input id="prof-owner" required placeholder="Nom & Prénom" class="border border-blue-200 p-3 rounded-xl w-full text-sm bg-white focus:ring-2 focus:ring-blue-500/20 outline-none">
-                        <input id="prof-contact" placeholder="Téléphone (pour le certificat)" class="border border-blue-200 p-3 rounded-xl w-full text-sm bg-white focus:ring-2 focus:ring-blue-500/20 outline-none">
-                    </div>
+                <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100 space-y-4 shadow-inner">
+                    <div class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest"><i data-lucide="user"></i> Propriétaire</div>
+                    <input id="prof-owner" required placeholder="Nom & Prénom" class="p-4 rounded-2xl w-full text-sm bg-white border border-blue-200 outline-none font-bold focus:ring-4 focus:ring-blue-500/10 transition-all">
+                    <input id="prof-contact" placeholder="Tél (Optionnel)" class="p-4 rounded-2xl w-full text-sm bg-white border border-blue-200 outline-none font-bold focus:ring-4 focus:ring-blue-500/10 transition-all">
                 </div>
-
-                <div class="space-y-4">
-                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider ml-1">Carte Grise</div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="prof-make" required placeholder="Marque" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
-                        <input id="prof-model" required placeholder="Modèle" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input id="prof-year" type="number" required placeholder="Année" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
-                        <input id="prof-mileage" type="number" required placeholder="Km actuel" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
-                    </div>
-                    <input id="prof-plate" required placeholder="Immatriculation (AA-123-BB)" class="border border-slate-200 p-3.5 rounded-xl w-full uppercase focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
-                    <input id="prof-vin" placeholder="N° VIN / Châssis (Optionnel)" class="border border-slate-200 p-3.5 rounded-xl w-full uppercase focus:ring-2 focus:ring-blue-500/20 outline-none font-medium text-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Marque</label><input id="prof-make" required class="p-4 border border-slate-100 bg-slate-50 rounded-2xl w-full outline-none font-bold"></div>
+                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Modèle</label><input id="prof-model" required class="p-4 border border-slate-100 bg-slate-50 rounded-2xl w-full outline-none font-bold"></div>
                 </div>
-
-                <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-slate-800 transition-all active:scale-[0.98] mt-2">
-                    <i data-lucide="save" class="w-5 h-5"></i> Enregistrer
-                </button>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Année</label><input id="prof-year" type="number" required class="p-4 border border-slate-100 bg-slate-50 rounded-2xl w-full outline-none font-bold"></div>
+                    <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Km Initial</label><input id="prof-mileage" type="number" required class="p-4 border border-slate-100 bg-slate-50 rounded-2xl w-full outline-none font-bold"></div>
+                </div>
+                <div class="space-y-2"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Immatriculation</label><input id="prof-plate" required placeholder="ex: AA-123-BB" class="p-4 border border-slate-100 bg-slate-50 rounded-2xl w-full uppercase outline-none font-black text-xl text-center tracking-widest"></div>
+                <button type="submit" class="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-black active:scale-[0.98] transition-all mt-4 shadow-2xl shadow-slate-900/20 text-lg">Sauvegarder</button>
             </form>
         </div>
     </div>
 
-    <!-- LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, onSnapshot, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'autocarnet-v3';
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentUser = null;
-        let currentVehicleId = null;
-        let vehicleList = [];
-        let currentLogs = [];
-        let filterType = 'all';
-        let unsubLogs = null;
+    <script>
+        // --- LOGIQUE LUXUI ---
+        let vehicles = JSON.parse(localStorage.getItem('autocarnet_v4_vehicles')) || [];
+        let logsByCar = JSON.parse(localStorage.getItem('autocarnet_v4_logs')) || {};
+        let currentVehicleId = localStorage.getItem('autocarnet_v4_currentId') || null;
+        let activeFilter = 'all';
 
         const el = (id) => document.getElementById(id);
-        const formatMoney = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(amount).replace('XOF', 'FCFA');
 
-        const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-            else await signInAnonymously(auth);
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) loadVehicles(user.uid);
-        });
-
-        initAuth();
-
-        function loadVehicles(uid) {
-            onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'vehicles'), (snapshot) => {
-                vehicleList = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
-                el('loading-state').classList.add('hidden');
-
-                if (vehicleList.length === 0) {
-                    showOnboarding();
-                } else {
-                    if (!currentVehicleId || !vehicleList.find(v => v.id === currentVehicleId)) {
-                        switchVehicle(vehicleList[0].id);
-                    } else {
-                        renderHeaderSelector();
-                        renderDashboard();
-                    }
-                    el('onboarding-state').classList.add('hidden');
-                    el('app-content').classList.remove('hidden');
-                    el('bottom-nav').classList.remove('hidden');
-                    el('vehicle-selector-container').classList.remove('hidden');
+        function init() {
+            if (vehicles.length === 0) {
+                el('onboarding-state').classList.remove('hidden');
+                el('app-content').classList.add('hidden');
+            } else {
+                if (!currentVehicleId || !vehicles.find(v => v.id === currentVehicleId)) {
+                    currentVehicleId = vehicles[0].id;
                 }
-            });
+                el('onboarding-state').classList.add('hidden');
+                el('app-content').classList.remove('hidden');
+                el('bottom-nav').classList.remove('hidden');
+                el('vehicle-selector-container').classList.remove('hidden');
+                renderHeader();
+                renderAll();
+            }
+            lucide.createIcons();
         }
 
-        function switchVehicle(vehId) {
-            currentVehicleId = vehId;
-            renderHeaderSelector();
-            renderDashboard();
-            
-            if (unsubLogs) unsubLogs();
-            const logsRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', vehId, 'logs');
-            unsubLogs = onSnapshot(logsRef, (snapshot) => {
-                currentLogs = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
-                currentLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
-                renderLogs();
-                updateStats();
-                checkAlerts();
-            });
-        }
-
-        function renderHeaderSelector() {
+        function renderHeader() {
             const select = el('vehicle-select');
             select.innerHTML = '';
-            vehicleList.forEach(v => {
+            vehicles.forEach(v => {
                 const opt = document.createElement('option');
                 opt.value = v.id;
                 opt.text = `${v.make} ${v.model}`;
-                opt.className = "text-slate-900 bg-white";
-                if(v.id === currentVehicleId) opt.selected = true;
+                opt.selected = v.id === currentVehicleId;
                 select.appendChild(opt);
             });
+            select.onchange = (e) => {
+                currentVehicleId = e.target.value;
+                localStorage.setItem('autocarnet_v4_currentId', currentVehicleId);
+                renderAll();
+            };
         }
 
-        function renderDashboard() {
-            const car = vehicleList.find(v => v.id === currentVehicleId);
+        function renderAll() {
+            const car = vehicles.find(v => v.id === currentVehicleId);
             if (!car) return;
 
-            el('car-title').textContent = `${car.make} ${car.model}`;
+            el('car-title').textContent = car.make;
             el('car-year').textContent = car.year;
-            el('car-mileage').textContent = `${parseInt(car.mileage).toLocaleString()} km`;
+            el('car-mileage').textContent = parseInt(car.mileage).toLocaleString();
             el('car-plate').textContent = car.plate;
-            el('car-owner').textContent = car.owner || 'Propriétaire inconnu';
-            
+            el('car-owner').textContent = car.owner;
+            el('cert-owner').textContent = car.owner;
             el('cert-car').textContent = `${car.make} ${car.model}`;
-            el('cert-vin').textContent = `VIN: ${car.vin || 'Non renseigné'}`;
-            el('cert-owner').textContent = car.owner || '--';
-        }
+            el('cert-vin').textContent = car.vin || car.plate;
 
-        function renderLogs() {
+            const carLogs = logsByCar[currentVehicleId] || [];
+            carLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
             const container = el('timeline-container');
             const tbody = el('cert-table-body');
             container.innerHTML = '';
             tbody.innerHTML = '';
 
-            const filtered = filterType === 'all' ? currentLogs : currentLogs.filter(l => l.type === filterType);
+            const filtered = activeFilter === 'all' ? carLogs : carLogs.filter(l => l.type === activeFilter);
             el('logs-count-badge').textContent = filtered.length;
 
-            if(filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-100 text-slate-400">
-                    <i data-lucide="history" class="w-10 h-10 mx-auto mb-3 opacity-50"></i>
-                    <p class="font-medium">Aucun historique trouvé.</p>
-                </div>`;
-                lucide.createIcons();
-                return;
-            }
-
-            filtered.forEach(log => {
-                let trustIcon = '';
-                let trustBadge = '';
-                
-                if (log.isCertified) {
-                    if (log.hasProof && log.provider && log.providerPhone) {
-                        trustIcon = '<i data-lucide="shield-check" class="w-4 h-4 text-green-500 fill-green-50"></i>';
-                        trustBadge = `<span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded-md font-bold border border-green-100 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Vérifié</span>`;
-                    } else {
-                        trustIcon = '<i data-lucide="alert-circle" class="w-4 h-4 text-orange-400"></i>';
-                    }
-                }
-
+            filtered.forEach((log, idx) => {
                 const card = document.createElement('div');
                 card.className = "relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group slide-up";
-                const colors = { maintenance: 'text-blue-600 bg-blue-100', repair: 'text-orange-600 bg-orange-100', admin: 'text-purple-600 bg-purple-100', upgrade: 'text-emerald-600 bg-emerald-100' };
-                const badgeColor = colors[log.type] || 'text-slate-600 bg-slate-100';
-
-                // File Logic
-                const fileDisplay = log.proofFileName ? 
-                    `<div class="flex items-center gap-2 text-green-700 bg-green-50 px-2 py-1 rounded-lg text-xs font-bold w-fit mt-2 border border-green-100"><i data-lucide="file-check" class="w-3.5 h-3.5"></i> ${log.proofFileName}</div>` :
-                    (log.hasProof ? `<div class="flex items-center gap-2 text-green-700 bg-green-50 px-2 py-1 rounded-lg text-xs font-bold w-fit mt-2 border border-green-100"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Preuve jointe</div>` : '');
-
+                card.style.animationDelay = `${idx * 0.05}s`;
+                
+                const isCertified = log.isCertified && log.provider && log.providerPhone;
+                const iconMap = { maintenance: 'settings', repair: 'wrench', admin: 'shield' };
+                const currentIcon = iconMap[log.type] || 'circle-dot';
+                
                 card.innerHTML = `
-                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-slate-50 bg-white shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 absolute left-0 md:static transition-transform duration-300 group-hover:scale-110">
-                        <div class="w-3 h-3 rounded-full ${log.type === 'maintenance' ? 'bg-blue-500' : log.type === 'repair' ? 'bg-orange-500' : 'bg-slate-400'}"></div>
+                    <div class="flex items-center justify-center w-12 h-12 rounded-2xl border-4 border-slate-50 bg-white shadow-lg shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 absolute left-0 md:static transition-transform duration-300 group-hover:scale-110">
+                        <i data-lucide="${currentIcon}" class="w-5 h-5 ${log.type === 'maintenance' ? 'text-blue-500' : log.type === 'admin' ? 'text-purple-500' : 'text-orange-500'}"></i>
                     </div>
-                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] ml-16 md:ml-0 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300 relative group-hover:-translate-y-1">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded-md ${badgeColor}">${log.type}</span>
-                            <span class="text-xs font-bold text-slate-400">${new Date(log.date).toLocaleDateString('fr-FR')}</span>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3.5rem)] ml-16 md:ml-0 bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-500 relative group-hover:-translate-y-2 group-hover:border-blue-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full ${log.type === 'maintenance' ? 'bg-blue-50 text-blue-600' : log.type === 'admin' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-orange-600'}">${log.type}</span>
+                            <span class="text-xs font-black text-slate-300 uppercase tracking-widest">${new Date(log.date).toLocaleDateString()}</span>
                         </div>
-                        <h4 class="font-bold text-slate-800 text-base flex items-center gap-2 mb-2 leading-tight">
-                            ${log.title} ${trustIcon}
+                        <h4 class="font-black text-slate-800 text-lg flex items-center gap-2 mb-3 tracking-tight">
+                            ${log.title} ${isCertified ? '<span class="text-green-500"><i data-lucide="check-circle-2" class="w-5 h-5 fill-green-50"></i></span>' : ''}
                         </h4>
-                        
-                        <div class="text-sm text-slate-600 space-y-2 mb-3">
-                            <div class="flex items-center gap-2"><i data-lucide="gauge" class="w-4 h-4 text-slate-400"></i> <span class="font-medium text-slate-700">${parseInt(log.mileage).toLocaleString()} km</span></div>
-                            ${log.provider ? `<div class="flex items-center gap-2"><i data-lucide="store" class="w-4 h-4 text-slate-400"></i> <span class="truncate max-w-[200px]">${log.provider}</span> ${trustBadge}</div>` : ''}
-                            ${fileDisplay}
+                        <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-500 mb-5">
+                            <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl"><i data-lucide="gauge" class="w-3.5 h-3.5"></i> ${parseInt(log.mileage).toLocaleString()} km</div>
+                            ${log.provider ? `<div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl"><i data-lucide="store" class="w-3.5 h-3.5"></i> ${log.provider}</div>` : ''}
+                            ${log.proofFileName ? `<div class="text-blue-600 flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-xl"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i> ${log.proofFileName}</div>` : ''}
                         </div>
-
-                         <div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                             <button onclick="editLog('${log.id}')" class="p-1.5 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i></button>
-                             <button onclick="deleteLog('${log.id}')" class="p-1.5 hover:bg-red-50 text-red-400 rounded-lg transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </div>
-                        <div class="font-bold text-slate-700 bg-slate-50 px-3 py-1.5 rounded-lg text-sm w-fit inline-block border border-slate-100">
-                            ${log.cost > 0 ? formatMoney(log.cost) : 'Gratuit'}
+                        <div class="flex justify-between items-center pt-4 border-t border-slate-50">
+                            <div class="font-black text-slate-900 text-lg">${log.cost > 0 ? new Intl.NumberFormat().format(log.cost) + ' FCFA' : 'GRATUIT'}</div>
+                            <div class="flex gap-2">
+                                <button onclick="editLog('${log.id}')" class="p-2 hover:bg-blue-50 rounded-xl text-blue-500 transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deleteLog('${log.id}')" class="p-2 hover:bg-red-50 rounded-xl text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
                         </div>
                     </div>
                 `;
                 container.appendChild(card);
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors";
                 tr.innerHTML = `
-                    <td class="px-6 py-4 text-slate-500 font-medium whitespace-nowrap">${new Date(log.date).toLocaleDateString('fr-FR')}</td>
-                    <td class="px-6 py-4">
-                        <div class="font-bold text-slate-800">${log.title}</div>
-                        <div class="text-xs text-slate-500 mt-0.5">${log.provider || ''}</div>
-                    </td>
-                    <td class="px-6 py-4 text-right font-mono text-slate-600">${parseInt(log.mileage).toLocaleString()}</td>
-                    <td class="px-6 py-4 text-center">
-                        ${log.hasProof ? '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20">Oui</span>' : '<span class="text-slate-300">-</span>'}
-                    </td>
+                    <td class="px-8 py-5 text-slate-400 font-bold whitespace-nowrap">${new Date(log.date).toLocaleDateString()}</td>
+                    <td class="px-8 py-5 font-black text-slate-800 text-base">${log.title} <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">${log.provider || ''}</div></td>
+                    <td class="px-8 py-5 text-right font-black text-slate-600 text-lg">${parseInt(log.mileage).toLocaleString()}</td>
+                    <td class="px-8 py-5 text-center">${log.hasProof ? '<span class="text-green-500"><i data-lucide="check" class="w-5 h-5 mx-auto"></i></span>' : '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
-            lucide.createIcons();
-        }
 
-        function updateStats() {
-            const car = vehicleList.find(v => v.id === currentVehicleId);
-            if(!car) return;
+            const totalCost = carLogs.reduce((acc, l) => acc + (parseInt(l.cost) || 0), 0);
+            el('stat-invest').textContent = new Intl.NumberFormat().format(totalCost) + ' F';
+            el('stat-logs').textContent = carLogs.length;
 
-            const total = currentLogs.reduce((acc, l) => acc + (l.cost || 0), 0);
-            el('stat-invest').textContent = formatMoney(total);
-            el('stat-logs').textContent = currentLogs.length;
+            // Next Service Logic LuxUI
+            const oilChanges = carLogs.filter(l => l.title.toLowerCase().includes('vidange'));
+            if(oilChanges.length > 0) {
+                const lastMileage = parseInt(oilChanges[0].mileage);
+                const nextMileage = lastMileage + 10000;
+                el('stat-next-service').textContent = nextMileage.toLocaleString() + ' km';
+                el('stat-next-service').className = (nextMileage < parseInt(car.mileage)) ? "font-black text-red-500 text-xl" : "font-black text-slate-800 text-xl";
+            } else { el('stat-next-service').textContent = '-'; }
 
-            const lastOil = currentLogs.find(l => l.title.toLowerCase().includes('vidange'));
-            if(lastOil) {
-                const next = parseInt(lastOil.mileage) + 10000;
-                el('stat-next-service').textContent = `~${next.toLocaleString()} km`;
-                el('stat-next-service').classList.toggle('text-red-500', next < parseInt(car.mileage));
-                el('stat-next-service').classList.toggle('text-slate-800', next >= parseInt(car.mileage));
-            }
-
-            let score = 0;
-            if(car.vin && car.vin.length > 5) score += 20;
-            if(car.owner && car.owner.length > 3) score += 10;
-            score += Math.min(currentLogs.length * 3, 30);
-            const verifiedLogs = currentLogs.filter(l => l.isCertified && l.hasProof && l.provider && l.providerPhone);
-            score += Math.min(verifiedLogs.length * 5, 40);
-
-            // Animate Score
+            // Score Confiance LuxUI
+            let score = 20; 
+            if (car.vin) score += 20;
+            score += Math.min(carLogs.length * 5, 30);
+            score += Math.min(carLogs.filter(l => l.hasProof).length * 10, 30);
             el('trust-score-text').textContent = score + "%";
-            const offset = 150 - (150 * score) / 100;
-            el('trust-score-circle').style.strokeDashoffset = offset;
+            el('trust-score-circle').style.strokeDashoffset = 176 - (176 * score) / 100;
             
-            el('trust-score-circle').classList.remove('text-green-500', 'text-orange-500', 'text-red-500');
-            el('trust-score-icon').classList.remove('text-green-500', 'text-orange-500', 'text-red-500');
-            
-            if(score >= 70) {
-                 el('trust-score-circle').classList.add('text-green-500');
-                 el('trust-score-icon').classList.add('text-green-500');
-            } else if(score >= 40) {
-                 el('trust-score-circle').classList.add('text-orange-500');
-                 el('trust-score-icon').classList.add('text-orange-500');
-            } else {
-                 el('trust-score-circle').classList.add('text-red-500');
-                 el('trust-score-icon').classList.add('text-red-500');
-            }
+            const icon = el('trust-score-icon');
+            if (score > 70) { el('trust-score-circle').style.color = "#22c55e"; icon.style.color = "#22c55e"; }
+            else if (score > 40) { el('trust-score-circle').style.color = "#f59e0b"; icon.style.color = "#f59e0b"; }
+            else { el('trust-score-circle').style.color = "#ef4444"; icon.style.color = "#ef4444"; }
+
+            lucide.createIcons();
+            checkAlerts(carLogs);
         }
 
-        function checkAlerts() {
-            const container = el('alerts-container');
-            container.innerHTML = '';
+        function saveToLocal() {
+            localStorage.setItem('autocarnet_v4_vehicles', JSON.stringify(vehicles));
+            localStorage.setItem('autocarnet_v4_logs', JSON.stringify(logsByCar));
+            renderAll();
+        }
+
+        function toggleModal(id, show) { el(id).classList.toggle('active', show); }
+
+        function switchView(viewId) {
+            el('view-dashboard').classList.toggle('hidden', viewId !== 'view-dashboard');
+            el('view-buyer').classList.toggle('hidden', viewId !== 'view-buyer');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('text-blue-400', 'bg-white/5');
+                b.classList.add('text-slate-500');
+            });
+            const activeNav = viewId === 'view-dashboard' ? el('nav-dashboard') : el('nav-buyer');
+            activeNav.classList.add('text-blue-400', 'bg-white/5');
+            activeNav.classList.remove('text-slate-500');
+        }
+
+        function setFilter(filter, btn) {
+            activeFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active', 'bg-slate-900', 'text-white', 'shadow-xl');
+                b.classList.add('text-slate-500');
+            });
+            btn.classList.add('active', 'bg-slate-900', 'text-white', 'shadow-xl');
+            btn.classList.remove('text-slate-500');
+            renderAll();
+        }
+
+        el('form-log').onsubmit = (e) => {
+            e.preventDefault();
+            const id = el('log-id').value || Date.now().toString();
+            const newLog = {
+                id,
+                type: el('log-type').value,
+                date: el('log-date').value,
+                title: el('log-title').value,
+                mileage: el('log-mileage').value,
+                cost: parseFloat(el('log-cost').value) || 0,
+                isCertified: el('log-certified').checked,
+                provider: el('log-provider').value,
+                providerPhone: el('log-provider-phone').value,
+                expiryDate: el('log-expiry').value,
+                hasProof: el('log-file').files.length > 0 || (el('log-id').value && logsByCar[currentVehicleId].find(l => l.id === id).hasProof),
+                proofFileName: el('log-file').files[0]?.name || (el('log-id').value ? logsByCar[currentVehicleId].find(l => l.id === id).proofFileName : null)
+            };
+            if (!logsByCar[currentVehicleId]) logsByCar[currentVehicleId] = [];
+            const idx = logsByCar[currentVehicleId].findIndex(l => l.id === id);
+            if (idx > -1) logsByCar[currentVehicleId][idx] = newLog;
+            else logsByCar[currentVehicleId].push(newLog);
+            const car = vehicles.find(v => v.id === currentVehicleId);
+            if (parseInt(newLog.mileage) > parseInt(car.mileage)) car.mileage = newLog.mileage;
+            toggleModal('modal-log', false);
+            saveToLocal();
+        };
+
+        window.editLog = (id) => {
+            const log = logsByCar[currentVehicleId].find(l => l.id === id);
+            el('log-id').value = log.id; el('log-type').value = log.type; el('log-date').value = log.date;
+            el('log-title').value = log.title; el('log-mileage').value = log.mileage; el('log-cost').value = log.cost;
+            el('log-certified').checked = log.isCertified; el('log-provider').value = log.provider || '';
+            el('log-provider-phone').value = log.providerPhone || ''; el('log-expiry').value = log.expiryDate || '';
+            toggleExpiryField(); toggleProDetails();
+            el('file-name').textContent = log.proofFileName || "Attacher une facture";
+            toggleModal('modal-log', true);
+            el('modal-log-title').textContent = "Modifier l'entrée";
+        };
+
+        window.deleteLog = (id) => { if(confirm("Supprimer cette opération définitivement ?")) { logsByCar[currentVehicleId] = logsByCar[currentVehicleId].filter(l => l.id !== id); saveToLocal(); } };
+
+        el('form-profile').onsubmit = (e) => {
+            e.preventDefault();
+            const id = el('prof-id').value || Date.now().toString();
+            const newCar = {
+                id, owner: el('prof-owner').value, ownerContact: el('prof-contact').value,
+                make: el('prof-make').value, model: el('prof-model').value, year: el('prof-year').value,
+                mileage: el('prof-mileage').value, plate: el('prof-plate').value, vin: el('prof-vin').value
+            };
+            const idx = vehicles.findIndex(v => v.id === id);
+            if (idx > -1) vehicles[idx] = newCar;
+            else { vehicles.push(newCar); currentVehicleId = id; localStorage.setItem('autocarnet_v4_currentId', id); }
+            toggleModal('modal-profile', false);
+            init();
+            saveToLocal();
+        };
+
+        window.openProfileModal = (car = null) => {
+            el('form-profile').reset();
+            if (car) {
+                el('prof-id').value = car.id; el('prof-owner').value = car.owner;
+                el('prof-contact').value = car.ownerContact; el('prof-make').value = car.make;
+                el('prof-model').value = car.model; el('prof-year').value = car.year;
+                el('prof-mileage').value = car.mileage; el('prof-plate').value = car.plate;
+                el('prof-vin').value = car.vin || '';
+                el('modal-profile-title').textContent = "Modifier Véhicule";
+            } else { el('modal-profile-title').textContent = "Configuration"; }
+            toggleModal('modal-profile', true);
+        };
+
+        window.openLogModal = () => {
+            el('form-log').reset(); el('log-id').value = ''; el('log-date').value = new Date().toISOString().split('T')[0];
+            el('file-name').textContent = "Attacher une facture"; toggleExpiryField(); toggleProDetails();
+            toggleModal('modal-log', true); el('modal-log-title').textContent = "Nouvelle Entrée";
+        };
+
+        window.toggleExpiryField = () => el('expiry-field').classList.toggle('hidden', el('log-type').value !== 'admin');
+        window.toggleProDetails = () => el('pro-details').classList.toggle('hidden', !el('log-certified').checked);
+        window.handleFileChange = () => {
+            const name = el('log-file').files[0]?.name || "Attacher une facture";
+            el('file-name').textContent = name;
+            el('file-icon').className = "w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30";
+        };
+
+        function checkAlerts(carLogs) {
+            const container = el('alerts-container'); container.innerHTML = '';
             const now = new Date();
-            currentLogs.forEach(log => {
-                if(log.type === 'admin' && log.expiryDate) {
-                    const days = (new Date(log.expiryDate) - now) / (86400000);
-                    if(days < 30) {
+            carLogs.forEach(log => {
+                if (log.expiryDate) {
+                    const days = (new Date(log.expiryDate) - now) / 86400000;
+                    if (days < 30) {
                         const div = document.createElement('div');
-                        const urgent = days < 0;
-                        div.className = `p-4 rounded-xl flex items-center gap-3 text-sm font-bold shadow-sm border ${urgent ? 'bg-red-50 text-red-900 border-red-100' : 'bg-orange-50 text-orange-900 border-orange-100'}`;
-                        div.innerHTML = `<div class="p-2 bg-white/50 rounded-lg"><i data-lucide="alert-circle" class="w-5 h-5"></i></div> <div class="flex-1">${log.title} ${urgent ? 'a expiré !' : 'expire bientôt'}</div>`;
+                        const isPast = days < 0;
+                        div.className = `p-5 rounded-3xl flex items-center gap-4 text-sm font-black border slide-up ${isPast ? 'bg-red-50 text-red-900 border-red-100' : 'bg-orange-50 text-orange-900 border-orange-100 shadow-xl shadow-orange-500/10'}`;
+                        div.innerHTML = `<div class="bg-white p-2.5 rounded-2xl shadow-sm"><i data-lucide="alert-circle" class="w-6 h-6"></i></div> <div><div class="uppercase tracking-widest text-[10px] opacity-60 mb-1">Alerte Échéance</div><span>${log.title} ${isPast ? 'est expiré !' : 'expire prochainement'}</span></div>`;
                         container.appendChild(div);
                     }
                 }
@@ -687,223 +621,7 @@
             lucide.createIcons();
         }
 
-        // --- NEW MODAL LOGIC (CSS TRANSITIONS) ---
-        window.toggleModal = (id, show) => {
-            const m = el(id);
-            if(show) {
-                m.classList.add('active');
-            } else {
-                m.classList.remove('active');
-            }
-        };
-
-        // --- INTERACTIONS ---
-        el('vehicle-select').addEventListener('change', (e) => switchVehicle(e.target.value));
-
-        el('btn-add-car-header').addEventListener('click', () => openProfileModal());
-        el('btn-edit-car-header').addEventListener('click', () => openProfileModal(vehicleList.find(v => v.id === currentVehicleId)));
-        el('btn-start-onboarding').addEventListener('click', () => openProfileModal());
-
-        function openProfileModal(car = null) {
-            el('form-profile').reset();
-            if(car) {
-                el('modal-profile-title').textContent = "Modifier le véhicule";
-                el('prof-id').value = car.id;
-                el('prof-make').value = car.make;
-                el('prof-model').value = car.model;
-                el('prof-year').value = car.year;
-                el('prof-mileage').value = car.mileage;
-                el('prof-plate').value = car.plate;
-                el('prof-vin').value = car.vin || '';
-                el('prof-owner').value = car.owner || '';
-                el('prof-contact').value = car.ownerContact || '';
-            } else {
-                el('modal-profile-title').textContent = "Nouveau Véhicule";
-                el('prof-id').value = '';
-            }
-            toggleModal('modal-profile', true);
-        }
-
-        el('form-profile').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = el('prof-id').value;
-            const data = {
-                make: el('prof-make').value,
-                model: el('prof-model').value,
-                year: el('prof-year').value,
-                mileage: el('prof-mileage').value,
-                plate: el('prof-plate').value,
-                vin: el('prof-vin').value,
-                owner: el('prof-owner').value,
-                ownerContact: el('prof-contact').value,
-                updatedAt: serverTimestamp()
-            };
-
-            if(id) {
-                await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', id), data);
-            } else {
-                data.createdAt = serverTimestamp();
-                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles'), data);
-            }
-            toggleModal('modal-profile', false);
-        });
-
-        el('nav-add').addEventListener('click', () => openLogModal());
-        el('btn-add-log-mobile').addEventListener('click', () => openLogModal());
-
-        window.editLog = (id) => {
-            const log = currentLogs.find(l => l.id === id);
-            if(log) openLogModal(log);
-        };
-
-        window.deleteLog = (id) => {
-            if(confirm("Voulez-vous vraiment supprimer cette entrée ?")) deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', currentVehicleId, 'logs', id));
-        };
-
-        function openLogModal(log = null) {
-            const form = el('form-add-log');
-            form.reset();
-            el('log-id').value = '';
-            el('file-name').textContent = "Aucun fichier sélectionné";
-            el('file-icon').className = "w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center transition-colors group-hover:bg-blue-50 group-hover:text-blue-500";
-            
-            if(log) {
-                el('modal-log-title').innerHTML = `<i data-lucide="edit-3" class="w-6 h-6 text-blue-600"></i> Modifier l'entrée`;
-                el('log-id').value = log.id;
-                el('log-type').value = log.type;
-                el('log-date').value = log.date;
-                el('log-title').value = log.title;
-                el('log-mileage').value = log.mileage;
-                el('log-cost').value = log.cost;
-                el('log-certified').checked = log.isCertified;
-                el('log-provider').value = log.provider || '';
-                el('log-provider-phone').value = log.providerPhone || '';
-                el('log-expiry').value = log.expiryDate || '';
-                el('btn-save-text').textContent = "Mettre à jour";
-                
-                if(log.isCertified) el('pro-details').classList.remove('hidden');
-                else el('pro-details').classList.add('hidden');
-
-                if(log.hasProof) {
-                    el('file-name').textContent = log.proofFileName ? `Fichier: ${log.proofFileName}` : "Preuve existante";
-                    el('file-icon').className = "w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center";
-                }
-            } else {
-                el('modal-log-title').innerHTML = `<i data-lucide="plus-circle" class="w-6 h-6 text-blue-600"></i> Nouvelle Entrée`;
-                el('log-date').value = new Date().toISOString().split('T')[0];
-                el('pro-details').classList.add('hidden');
-                el('btn-save-text').textContent = "Valider l'entrée";
-            }
-            toggleModal('modal-add-log', true);
-            lucide.createIcons();
-        }
-
-        // File Listener
-        el('log-file').addEventListener('change', (e) => {
-            const name = e.target.files[0]?.name || "Aucun fichier sélectionné";
-            el('file-name').textContent = name;
-            const icon = el('file-icon');
-            if(e.target.files.length > 0) {
-                icon.className = "w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center";
-            } else {
-                icon.className = "w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center";
-            }
-        });
-
-        el('log-certified').addEventListener('change', (e) => {
-             if(e.target.checked) el('pro-details').classList.remove('hidden');
-             else el('pro-details').classList.add('hidden');
-        });
-
-        el('log-type').addEventListener('change', (e) => {
-            if(e.target.value === 'admin') el('expiry-field').classList.remove('hidden');
-            else el('expiry-field').classList.add('hidden');
-        });
-
-        el('form-add-log').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const logId = el('log-id').value;
-            const isCert = el('log-certified').checked;
-            const provider = el('log-provider').value;
-            const providerPhone = el('log-provider-phone').value;
-            const fileInput = el('log-file');
-            
-            if(isCert && (!provider || !providerPhone)) {
-                alert("Pour certifier une intervention 'Pro', le nom et téléphone du garage sont obligatoires.");
-                return;
-            }
-
-            const currentLog = logId ? currentLogs.find(l => l.id === logId) : null;
-            const newFileName = fileInput.files.length > 0 ? fileInput.files[0].name : null;
-            const finalFileName = newFileName || (currentLog ? currentLog.proofFileName : null);
-
-            const data = {
-                type: el('log-type').value,
-                date: el('log-date').value,
-                title: el('log-title').value,
-                mileage: parseInt(el('log-mileage').value),
-                cost: parseFloat(el('log-cost').value) || 0,
-                isCertified: isCert,
-                provider: provider,
-                providerPhone: providerPhone,
-                expiryDate: el('log-type').value === 'admin' ? el('log-expiry').value : null,
-                hasProof: fileInput.files.length > 0 || (currentLog && currentLog.hasProof),
-                proofFileName: finalFileName
-            };
-
-            const ref = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', currentVehicleId, 'logs');
-            
-            if(logId) {
-                data.updatedAt = serverTimestamp();
-                await updateDoc(doc(ref, logId), data);
-            } else {
-                data.createdAt = serverTimestamp();
-                await addDoc(ref, data);
-            }
-
-            const car = vehicleList.find(v => v.id === currentVehicleId);
-            if(car && data.mileage > parseInt(car.mileage)) {
-                await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', currentVehicleId), { mileage: data.mileage });
-            }
-
-            toggleModal('modal-add-log', false);
-        });
-
-        const switchView = (v) => {
-            el('view-dashboard').classList.add('hidden');
-            el('view-buyer').classList.add('hidden');
-            el(v).classList.remove('hidden');
-            
-            el('nav-dashboard').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 w-16 transition hover:text-slate-600";
-            el('nav-buyer').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 w-16 transition hover:text-slate-600";
-            
-            if(v === 'view-dashboard') el('nav-dashboard').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50/80 w-16 transition-all duration-300";
-            else el('nav-buyer').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50/80 w-16 transition-all duration-300";
-        };
-        
-        el('nav-dashboard').addEventListener('click', () => switchView('view-dashboard'));
-        el('nav-buyer').addEventListener('click', () => switchView('view-buyer'));
-
-        function showOnboarding() {
-             el('onboarding-state').classList.remove('hidden');
-             el('app-content').classList.add('hidden');
-             el('vehicle-selector-container').classList.add('hidden');
-        }
-
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('bg-slate-800', 'text-white', 'shadow-lg', 'scale-100');
-                    b.classList.add('bg-white', 'text-slate-600', 'border');
-                });
-                e.target.classList.remove('bg-white', 'text-slate-600', 'border');
-                e.target.classList.add('bg-slate-800', 'text-white', 'shadow-lg', 'scale-100');
-                filterType = e.target.getAttribute('data-filter');
-                renderLogs();
-            });
-        });
-
-        lucide.createIcons();
+        init();
     </script>
 </body>
 </html>
