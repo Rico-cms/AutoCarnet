@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCarnet - Multi-Véhicules</title>
+    <title>AutoCarnet - Expérience Premium</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,10 +12,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -25,9 +25,9 @@
             .print-break-inside-avoid { page-break-inside: avoid; }
         }
 
-        /* Animations */
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; opacity: 0; }
-        .slide-up { animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        /* Animations de chargement */
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(20px); }
         
         @keyframes fadeIn { to { opacity: 1; } }
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
@@ -45,31 +45,66 @@
                 transform: translateX(-1px);
             }
         }
+
+        /* Classes utilitaires pour les transitions de modales */
+        .modal-container { visibility: hidden; pointer-events: none; z-index: 50; }
+        .modal-container.active { visibility: visible; pointer-events: auto; }
+        
+        .modal-backdrop { opacity: 0; transition: opacity 0.3s ease-out; }
+        .modal-container.active .modal-backdrop { opacity: 1; }
+
+        .modal-content { 
+            transform: translateY(100%); 
+            opacity: 0; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .modal-container.active .modal-content { 
+            transform: translateY(0); 
+            opacity: 1; 
+        }
+
+        @media (min-width: 640px) {
+            .modal-content { 
+                transform: scale(0.95) translateY(10px); 
+                opacity: 0;
+            }
+            .modal-container.active .modal-content { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 pb-28 md:pb-10 selection:bg-blue-100 selection:text-blue-900">
+<body class="bg-slate-50 text-slate-900 pb-28 md:pb-10 selection:bg-blue-100 selection:text-blue-900 antialiased">
 
     <!-- HEADER -->
     <header class="bg-slate-900 text-white pt-6 pb-24 px-6 sticky top-0 z-10 shadow-lg no-print transition-all duration-300">
         <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 w-full sm:w-auto">
-                <i data-lucide="shield-check" class="text-green-400 w-8 h-8"></i>
+                <div class="relative">
+                    <div class="absolute inset-0 bg-green-400 blur-sm opacity-20 rounded-full"></div>
+                    <i data-lucide="shield-check" class="text-green-400 w-8 h-8 relative z-10"></i>
+                </div>
                 <div>
                     <h1 class="text-xl font-extrabold tracking-tight">AutoCarnet</h1>
-                    <p class="text-slate-400 text-xs font-medium">Gestion de Flotte & Historique</p>
+                    <p class="text-slate-400 text-xs font-medium tracking-wide">Gestion de Flotte & Historique</p>
                 </div>
             </div>
 
             <!-- Vehicle Selector -->
-            <div id="vehicle-selector-container" class="hidden w-full sm:w-auto flex items-center gap-2 bg-slate-800 p-1 rounded-xl border border-slate-700">
-                <select id="vehicle-select" class="bg-transparent text-white text-sm font-bold p-2 outline-none cursor-pointer w-full sm:w-48">
-                    <!-- Options injected via JS -->
-                </select>
-                <button id="btn-add-car-header" class="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition" title="Ajouter un véhicule">
+            <div id="vehicle-selector-container" class="hidden w-full sm:w-auto flex items-center gap-2 bg-slate-800/50 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/50 shadow-inner">
+                <div class="relative flex-1 sm:w-48">
+                    <select id="vehicle-select" class="bg-transparent text-white text-sm font-bold py-2 pl-3 pr-8 outline-none cursor-pointer w-full appearance-none relative z-10">
+                        <!-- Options injected via JS -->
+                    </select>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 z-0"></i>
+                </div>
+                <div class="w-px h-6 bg-slate-700 mx-1"></div>
+                <button id="btn-add-car-header" class="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition shadow-lg shadow-blue-900/20 active:scale-95" title="Ajouter un véhicule">
                     <i data-lucide="plus" class="w-4 h-4"></i>
                 </button>
-                <button id="btn-edit-car-header" class="p-2 hover:bg-slate-700 rounded-lg transition" title="Modifier ce véhicule">
-                    <i data-lucide="settings" class="w-4 h-4 text-slate-300"></i>
+                <button id="btn-edit-car-header" class="p-2 hover:bg-slate-700 rounded-lg transition active:scale-95" title="Modifier ce véhicule">
+                    <i data-lucide="settings-2" class="w-4 h-4 text-slate-300"></i>
                 </button>
             </div>
         </div>
@@ -81,127 +116,140 @@
         <!-- LOADING -->
         <div id="loading-state" class="text-center py-20 text-slate-500 flex flex-col items-center">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-500 mb-4"></div>
-            Chargement...
+            <span class="text-sm font-medium animate-pulse">Chargement de vos données...</span>
         </div>
 
         <!-- ONBOARDING (Zero Vehicles) -->
         <div id="onboarding-state" class="hidden flex flex-col items-center justify-center min-h-[50vh] text-center fade-in pt-10">
-            <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 p-6 rounded-3xl mb-6 shadow-xl shadow-blue-200 ring-4 ring-white">
-                <i data-lucide="car-front" class="w-16 h-16 text-white"></i>
+            <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 p-8 rounded-[2rem] mb-8 shadow-2xl shadow-blue-200 ring-8 ring-white transform transition hover:scale-105 duration-500">
+                <i data-lucide="car-front" class="w-20 h-20 text-white"></i>
             </div>
-            <h1 class="text-3xl font-bold text-slate-900 mb-2">Bienvenue</h1>
-            <p class="text-slate-500 mb-8 max-w-sm">Ajoutez votre premier véhicule pour commencer le suivi.</p>
-            <button id="btn-start-onboarding" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition shadow-xl hover:-translate-y-1 flex items-center gap-3">
-                <i data-lucide="plus-circle" class="w-5 h-5"></i> Ajouter un véhicule
+            <h1 class="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Bienvenue sur AutoCarnet</h1>
+            <p class="text-slate-500 mb-10 max-w-sm text-lg leading-relaxed">
+                Centralisez l'entretien de vos véhicules et valorisez votre patrimoine automobile.
+            </p>
+            <button id="btn-start-onboarding" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 flex items-center gap-3 text-lg">
+                <i data-lucide="plus-circle" class="w-6 h-6"></i> Ajouter mon premier véhicule
             </button>
         </div>
 
         <!-- APP CONTENT -->
         <div id="app-content" class="hidden space-y-6 fade-in">
             
-            <div id="alerts-container" class="space-y-2 no-print"></div>
+            <div id="alerts-container" class="space-y-3 no-print"></div>
 
             <!-- DASHBOARD CARD -->
-            <div class="bg-white rounded-xl shadow-xl shadow-slate-200 overflow-hidden print:shadow-none print:border print:border-slate-300">
-                <div class="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white">
-                    <div>
-                        <div class="flex items-center gap-3 mb-1.5">
-                            <h2 id="car-title" class="text-2xl font-black text-slate-800 tracking-tight">--</h2>
-                            <span id="car-year" class="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded font-mono border border-slate-200">--</span>
+            <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/60 overflow-hidden print:shadow-none print:border print:border-slate-300 border border-white/50">
+                <div class="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 bg-white relative overflow-hidden">
+                    <!-- Background decoration -->
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h2 id="car-title" class="text-3xl font-black text-slate-800 tracking-tight">--</h2>
+                            <span id="car-year" class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-md font-mono border border-slate-200">--</span>
                         </div>
-                        <div class="flex flex-wrap gap-4 text-sm font-medium text-slate-500">
-                            <span class="flex items-center gap-1.5">
-                                <i data-lucide="trending-up" class="w-4 h-4 text-slate-400"></i>
-                                <span id="car-mileage">-- km</span>
+                        <div class="flex flex-wrap gap-3 text-sm font-medium text-slate-500">
+                            <span class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                                <i data-lucide="gauge" class="w-4 h-4 text-slate-400"></i>
+                                <span id="car-mileage" class="text-slate-700">-- km</span>
                             </span>
-                            <span class="flex items-center gap-1.5 font-mono bg-slate-50 px-2 py-0.5 rounded text-slate-600">
-                                <i data-lucide="file-text" class="w-3.5 h-3.5 text-slate-400"></i>
-                                <span id="car-plate">--</span>
+                            <span class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 font-mono">
+                                <i data-lucide="credit-card" class="w-4 h-4 text-slate-400"></i>
+                                <span id="car-plate" class="text-slate-700">--</span>
                             </span>
-                            <span class="flex items-center gap-1.5 text-blue-600">
-                                <i data-lucide="user" class="w-3.5 h-3.5"></i>
-                                <span id="car-owner">--</span>
+                            <span class="flex items-center gap-1.5 bg-blue-50/50 px-3 py-1.5 rounded-lg border border-blue-100/50">
+                                <i data-lucide="user" class="w-4 h-4 text-blue-500"></i>
+                                <span id="car-owner" class="text-blue-700 font-semibold">--</span>
                             </span>
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-4 relative z-10 bg-slate-50/80 p-3 rounded-2xl border border-slate-100 backdrop-blur-sm">
                         <div class="text-right hidden sm:block">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Confiance</div>
-                            <div id="trust-score-text" class="font-black text-lg text-slate-400">0%</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Score Confiance</div>
+                            <div id="trust-score-text" class="font-black text-2xl text-slate-400 leading-none mt-0.5">0%</div>
                         </div>
-                        <div class="relative w-12 h-12 flex items-center justify-center">
+                        <div class="relative w-14 h-14 flex items-center justify-center">
                             <svg class="w-full h-full transform -rotate-90">
-                                <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="4" fill="transparent" class="text-slate-100" />
-                                <circle id="trust-score-circle" cx="24" cy="24" r="20" stroke="currentColor" stroke-width="4" fill="transparent" stroke-dasharray="125" stroke-dashoffset="125" class="text-blue-500 transition-all duration-1000 ease-out" />
+                                <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="5" fill="transparent" class="text-slate-200" />
+                                <circle id="trust-score-circle" cx="28" cy="28" r="24" stroke="currentColor" stroke-width="5" fill="transparent" stroke-dasharray="150" stroke-dashoffset="150" stroke-linecap="round" class="text-blue-500 transition-all duration-1000 ease-out" />
                             </svg>
-                            <i id="trust-score-icon" data-lucide="award" class="w-5 h-5 absolute text-slate-300"></i>
+                            <i id="trust-score-icon" data-lucide="award" class="w-6 h-6 absolute text-slate-300 transition-colors duration-500"></i>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-slate-50/50">
-                    <div class="p-4 text-center">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Investi</div>
-                        <div id="stat-invest" class="font-bold text-slate-700">0 FCFA</div>
+                    <div class="p-4 text-center hover:bg-white transition-colors">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Total Investi</div>
+                        <div id="stat-invest" class="font-bold text-slate-800 text-lg">0 FCFA</div>
                     </div>
-                    <div class="p-4 text-center">
+                    <div class="p-4 text-center hover:bg-white transition-colors">
                         <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Entrées</div>
-                        <div id="stat-logs" class="font-bold text-slate-700">0</div>
+                        <div id="stat-logs" class="font-bold text-slate-800 text-lg">0</div>
                     </div>
-                    <div class="p-4 text-center">
-                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Prochain Entretien</div>
-                        <div id="stat-next-service" class="font-bold text-slate-700">-</div>
+                    <div class="p-4 text-center hover:bg-white transition-colors">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Prochain Service</div>
+                        <div id="stat-next-service" class="font-bold text-slate-800 text-lg">-</div>
                     </div>
                 </div>
             </div>
 
             <!-- TABS -->
-            <div id="view-dashboard" class="space-y-5 no-print">
+            <div id="view-dashboard" class="space-y-6 no-print">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-1">
-                    <h3 class="text-lg font-bold text-slate-800">Historique</h3>
-                    <div class="flex gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 no-scrollbar">
-                        <button data-filter="all" class="filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition bg-slate-800 text-white shadow-md">Tout</button>
-                        <button data-filter="maintenance" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition bg-white text-slate-600 border border-slate-200">Entretien</button>
-                        <button data-filter="admin" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition bg-white text-slate-600 border border-slate-200">Papiers</button>
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        Historique
+                        <span class="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full" id="logs-count-badge">0</span>
+                    </h3>
+                    <div class="flex gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 no-scrollbar p-0.5">
+                        <button data-filter="all" class="filter-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-slate-800 text-white shadow-lg shadow-slate-200 scale-100">Tout</button>
+                        <button data-filter="maintenance" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-white text-slate-600 border border-slate-200 hover:border-blue-200 hover:text-blue-600">Entretien</button>
+                        <button data-filter="admin" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all bg-white text-slate-600 border border-slate-200 hover:border-purple-200 hover:text-purple-600">Papiers</button>
                     </div>
                 </div>
 
-                <button id="btn-add-log-mobile" class="w-full sm:hidden py-3 bg-blue-50 text-blue-600 rounded-xl font-bold border border-blue-100 flex items-center justify-center gap-2 shadow-sm">
+                <button id="btn-add-log-mobile" class="w-full sm:hidden py-3.5 bg-blue-50 text-blue-600 rounded-xl font-bold border border-blue-100 flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition">
                     <i data-lucide="plus-circle" class="w-5 h-5"></i> Ajouter une intervention
                 </button>
 
-                <div id="timeline-container" class="space-y-6 relative timeline-line pb-10"></div>
+                <div id="timeline-container" class="space-y-6 relative timeline-line pb-12"></div>
             </div>
 
             <!-- VIEW: CERTIFICATE -->
             <div id="view-buyer" class="hidden space-y-6 slide-up">
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 rounded-3xl shadow-2xl text-center print:border print:border-slate-800 print:text-black print:bg-none">
-                    <div class="bg-white/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 backdrop-blur-sm print:hidden">
-                        <i data-lucide="shield-check" class="w-10 h-10 text-green-400"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mb-2">Certificat de Transparence</h2>
-                    <p class="text-slate-400 max-w-md mx-auto text-sm mb-6 print:text-slate-600">
-                        Historique certifié par le propriétaire.
-                    </p>
+                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8 rounded-3xl shadow-2xl text-center print:border print:border-slate-800 print:text-black print:bg-none relative overflow-hidden">
+                    <!-- Deco -->
+                    <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
                     
-                    <div class="grid grid-cols-2 gap-4 text-left print:grid-cols-2">
-                        <div class="bg-white/5 p-4 rounded-xl print:border print:border-slate-300">
-                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Propriétaire</div>
-                            <div id="cert-owner" class="font-bold text-lg">--</div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 backdrop-blur-md ring-1 ring-white/20 print:hidden shadow-lg">
+                            <i data-lucide="shield-check" class="w-10 h-10 text-green-400"></i>
                         </div>
-                        <div class="bg-white/5 p-4 rounded-xl print:border print:border-slate-300">
-                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Véhicule</div>
-                            <div id="cert-car" class="font-bold text-lg">--</div>
-                            <div id="cert-vin" class="text-xs font-mono text-slate-400 mt-1">VIN: --</div>
+                        <h2 class="text-2xl font-bold mb-2">Certificat de Transparence</h2>
+                        <p class="text-slate-400 max-w-md mx-auto text-sm mb-8 print:text-slate-600 leading-relaxed">
+                            Ce document atteste de l'historique d'entretien du véhicule tel que déclaré et documenté par son propriétaire.
+                        </p>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-left print:grid-cols-2">
+                            <div class="bg-white/5 p-5 rounded-2xl backdrop-blur-sm border border-white/10 print:border print:border-slate-300">
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Propriétaire</div>
+                                <div id="cert-owner" class="font-bold text-lg tracking-tight">--</div>
+                            </div>
+                            <div class="bg-white/5 p-5 rounded-2xl backdrop-blur-sm border border-white/10 print:border print:border-slate-300">
+                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Véhicule</div>
+                                <div id="cert-car" class="font-bold text-lg tracking-tight">--</div>
+                                <div id="cert-vin" class="text-xs font-mono text-slate-400 mt-1 opacity-80">VIN: --</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center px-2 no-print">
-                    <h3 class="text-lg font-bold text-slate-800">Opérations</h3>
-                    <button onclick="window.print()" class="flex items-center gap-2 text-sm font-bold text-slate-600 bg-slate-100 px-4 py-2 rounded-lg">
-                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimer
+                    <h3 class="text-lg font-bold text-slate-800">Opérations détaillées</h3>
+                    <button onclick="window.print()" class="flex items-center gap-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition shadow-sm">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimer le PDF
                     </button>
                 </div>
 
@@ -209,10 +257,10 @@
                     <table class="w-full text-sm text-left">
                         <thead class="bg-slate-50 text-slate-500 border-b border-slate-100">
                             <tr>
-                                <th class="px-5 py-4 font-bold uppercase text-[10px]">Date</th>
-                                <th class="px-5 py-4 font-bold uppercase text-[10px]">Opération</th>
-                                <th class="px-5 py-4 font-bold uppercase text-[10px] text-right">Km</th>
-                                <th class="px-5 py-4 font-bold uppercase text-[10px] text-center">Preuve</th>
+                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Date</th>
+                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Opération</th>
+                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-right">Km</th>
+                                <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Preuve</th>
                             </tr>
                         </thead>
                         <tbody id="cert-table-body" class="divide-y divide-slate-100"></tbody>
@@ -223,142 +271,165 @@
     </main>
 
     <!-- NAV BOTTOM -->
-    <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-200 px-6 py-2 pb-6 md:pb-2 z-40 flex justify-around items-center md:max-w-md md:mx-auto md:bottom-6 md:rounded-full md:shadow-2xl md:border no-print">
-        <button id="nav-dashboard" class="flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50 w-16 transition">
+    <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 px-6 py-2 pb-6 md:pb-2 z-40 flex justify-around items-center md:max-w-md md:mx-auto md:bottom-6 md:rounded-full md:shadow-2xl md:border md:ring-1 md:ring-slate-900/5 no-print">
+        <button id="nav-dashboard" class="flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50/80 w-16 transition-all duration-300">
             <i data-lucide="history" class="w-6 h-6"></i> <span class="text-[10px] font-bold">Journal</span>
         </button>
-        <button id="nav-add" class="flex flex-col items-center justify-center -mt-10 bg-slate-900 text-white w-14 h-14 rounded-2xl shadow-lg shadow-slate-300 hover:scale-105 transition hover:bg-slate-800 ring-4 ring-white">
-            <i data-lucide="plus-circle" class="w-7 h-7"></i>
+        <button id="nav-add" class="flex flex-col items-center justify-center -mt-10 bg-slate-900 text-white w-14 h-14 rounded-2xl shadow-lg shadow-slate-400/50 hover:scale-105 active:scale-95 transition-all duration-300 ring-4 ring-white">
+            <i data-lucide="plus" class="w-8 h-8"></i>
         </button>
-        <button id="nav-buyer" class="flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 w-16 transition hover:text-slate-600">
+        <button id="nav-buyer" class="flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 w-16 transition-all duration-300 hover:text-slate-600">
             <i data-lucide="share-2" class="w-6 h-6"></i> <span class="text-[10px] font-bold">Vente</span>
         </button>
     </nav>
 
     <!-- MODAL: ADD/EDIT LOG -->
-    <div id="modal-add-log" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 no-print modal-backdrop">
-        <div class="bg-white w-full max-w-lg sm:rounded-2xl rounded-t-2xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
+    <div id="modal-add-log" class="modal-container fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <!-- Backdrop -->
+        <div class="modal-backdrop absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleModal('modal-add-log', false)"></div>
+        
+        <!-- Content -->
+        <div class="modal-content relative bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-6 border-b border-slate-100 sticky top-0 bg-white rounded-t-2xl z-10">
                 <h2 id="modal-log-title" class="text-xl font-bold text-slate-800 flex items-center gap-2"></h2>
-                <button class="btn-close-modal p-2 hover:bg-slate-100 rounded-full text-slate-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="toggleModal('modal-add-log', false)" class="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form id="form-add-log" class="space-y-4 overflow-y-auto px-1 pb-2">
+            
+            <form id="form-add-log" class="space-y-5 overflow-y-auto p-6 scroll-smooth">
                 <input type="hidden" id="log-id">
                 
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Type</label>
-                        <select id="log-type" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
-                            <option value="maintenance">Entretien</option>
-                            <option value="repair">Réparation</option>
-                            <option value="admin">Papiers</option>
-                            <option value="upgrade">Amélioration</option>
-                        </select>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Type</label>
+                        <div class="relative">
+                            <select id="log-type" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium appearance-none transition-shadow">
+                                <option value="maintenance">Entretien</option>
+                                <option value="repair">Réparation</option>
+                                <option value="admin">Papiers</option>
+                                <option value="upgrade">Amélioration</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label>
-                        <input type="date" id="log-date" required class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Date</label>
+                        <input type="date" id="log-date" required class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium transition-shadow">
                     </div>
                 </div>
                 
-                <div id="expiry-field" class="hidden bg-purple-50 p-4 rounded-xl border border-purple-100">
-                     <label class="block text-xs font-bold text-purple-700 uppercase mb-1 flex items-center gap-2"><i data-lucide="calendar" class="w-3 h-3"></i> Expiration (Assurance/Visite)</label>
-                     <input type="date" id="log-expiry" class="w-full p-3 bg-white border border-purple-200 rounded-xl">
+                <div id="expiry-field" class="hidden bg-purple-50 p-4 rounded-xl border border-purple-100 animate-in slide-in-from-top-2">
+                     <label class="block text-xs font-bold text-purple-700 uppercase mb-1.5 flex items-center gap-2"><i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Expiration (Validité)</label>
+                     <input type="date" id="log-expiry" class="w-full p-3 bg-white border border-purple-200 rounded-xl text-purple-900 focus:ring-2 focus:ring-purple-500/20 outline-none">
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Titre de l'opération</label>
-                    <input type="text" id="log-title" required list="service-suggestions" placeholder="Ex: Vidange, Pneus..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Titre de l'opération</label>
+                    <input type="text" id="log-title" required list="service-suggestions" placeholder="Ex: Vidange 5W30, Changement Pneus..." class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium placeholder:font-normal transition-shadow">
                     <datalist id="service-suggestions">
-                        <option value="Vidange Moteur"></option><option value="Visite Technique"></option><option value="Assurance"></option><option value="Pneus"></option>
+                        <option value="Vidange Moteur + Filtres"></option><option value="Visite Technique"></option><option value="Renouvellement Assurance"></option><option value="Plaquettes de frein"></option>
                     </datalist>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Km</label>
-                        <input type="number" id="log-mileage" placeholder="ex: 120000" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Km Compteur</label>
+                        <div class="relative">
+                            <input type="number" id="log-mileage" placeholder="120000" class="w-full p-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium transition-shadow">
+                            <i data-lucide="gauge" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Coût (FCFA)</label>
-                        <input type="number" id="log-cost" placeholder="0" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Coût</label>
+                        <div class="relative">
+                            <input type="number" id="log-cost" placeholder="0" class="w-full p-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none font-medium transition-shadow">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">F</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Proof Logic -->
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-                    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
-                        <input type="checkbox" id="log-certified" class="w-4 h-4 text-blue-600 rounded cursor-pointer">
-                        <label for="log-certified" class="text-xs font-bold text-slate-700 cursor-pointer select-none flex-1">
-                            Travail effectué par un PRO ?
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                    <div class="flex items-center gap-3 border-b border-slate-200 pb-3">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" id="log-certified" class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-slate-300 bg-white checked:border-blue-600 checked:bg-blue-600 transition-all">
+                            <i data-lucide="check" class="pointer-events-none absolute left-1/2 top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                        </div>
+                        <label for="log-certified" class="text-sm font-bold text-slate-700 cursor-pointer select-none flex-1">
+                            Effectué par un professionnel ?
                         </label>
                     </div>
 
-                    <div id="pro-details" class="hidden space-y-3 animate-in fade-in">
-                        <div class="bg-yellow-50 text-yellow-800 text-xs p-2 rounded border border-yellow-100 flex gap-2">
-                            <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
-                            Pour valider le "Pro", le nom et le téléphone du garage sont requis.
+                    <div id="pro-details" class="hidden space-y-3 animate-in fade-in slide-in-from-top-2">
+                        <div class="bg-yellow-50 text-yellow-800 text-xs p-3 rounded-lg border border-yellow-100 flex gap-2 items-start">
+                            <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                            <span>Pour la certification, les coordonnées du garage sont requises.</span>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="log-provider" placeholder="Nom du Garage *" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-sm">
-                            <input type="tel" id="log-provider-phone" placeholder="Tél du Garage *" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-sm">
+                            <input type="text" id="log-provider" placeholder="Nom du Garage *" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none">
+                            <input type="tel" id="log-provider-phone" placeholder="Tél du Garage *" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none">
                         </div>
                     </div>
 
-                    <div class="relative group border border-slate-200 border-dashed rounded-lg p-3 hover:bg-white transition cursor-pointer">
+                    <div class="relative group border-2 border-slate-200 border-dashed rounded-xl p-4 hover:bg-white hover:border-blue-400 transition-all cursor-pointer bg-white/50">
                         <input type="file" id="log-file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
-                        <div class="flex items-center gap-3 relative z-10 pointer-events-none">
-                            <div id="file-icon" class="w-8 h-8 rounded-full bg-white shadow-sm text-slate-400 flex items-center justify-center"><i data-lucide="camera" class="w-4 h-4"></i></div>
-                            <div>
-                                <div class="text-[10px] font-bold text-slate-500 uppercase">Preuve (Facture/Reçu)</div>
-                                <div id="file-name" class="text-xs text-slate-800 font-medium">Aucun fichier</div>
+                        <div class="flex items-center gap-4 relative z-10 pointer-events-none">
+                            <div id="file-icon" class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center transition-colors group-hover:bg-blue-50 group-hover:text-blue-500">
+                                <i data-lucide="camera" class="w-5 h-5"></i>
                             </div>
+                            <div class="flex-1">
+                                <div class="text-xs font-bold text-slate-500 uppercase tracking-wide group-hover:text-blue-600 transition-colors">Preuve (Facture/Reçu)</div>
+                                <div id="file-name" class="text-sm text-slate-800 font-medium truncate">Aucun fichier sélectionné</div>
+                            </div>
+                            <div class="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-xs font-bold group-hover:bg-blue-600 group-hover:text-white transition-colors">Parcourir</div>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition flex justify-center items-center gap-2">
-                    <i data-lucide="check" class="w-5 h-5"></i> <span id="btn-save-text">Valider</span>
-                </button>
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 shadow-lg shadow-slate-900/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2 text-lg">
+                        <i data-lucide="check-circle-2" class="w-5 h-5"></i> <span id="btn-save-text">Valider l'entrée</span>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
     <!-- MODAL: VEHICLE PROFILE (ADD/EDIT) -->
-    <div id="modal-profile" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 no-print modal-backdrop">
-        <div class="bg-white w-full max-w-md p-6 rounded-2xl shadow-xl animate-in zoom-in-95 duration-200" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center mb-5">
+    <div id="modal-profile" class="modal-container fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="modal-backdrop absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleModal('modal-profile', false)"></div>
+        <div class="modal-content relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center p-6 border-b border-slate-100">
                 <h2 id="modal-profile-title" class="text-xl font-bold text-slate-800">Ajouter un véhicule</h2>
-                <button class="btn-close-modal text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="toggleModal('modal-profile', false)" class="text-slate-400 hover:text-slate-600 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
-            <form id="form-profile" class="space-y-4 max-h-[80vh] overflow-y-auto">
+            <form id="form-profile" class="space-y-5 overflow-y-auto p-6">
                 <input type="hidden" id="prof-id">
                 
-                <!-- Section Propriétaire -->
-                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
+                <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100 space-y-4">
                     <div class="flex items-center gap-2 text-blue-800 text-xs font-bold uppercase tracking-wider">
-                        <i data-lucide="user-check" class="w-4 h-4"></i> Propriétaire (Identité)
+                        <i data-lucide="user-check" class="w-4 h-4"></i> Propriétaire
                     </div>
-                    <input id="prof-owner" required placeholder="Nom & Prénom" class="border border-blue-200 p-2.5 rounded-lg w-full text-sm bg-white">
-                    <input id="prof-contact" placeholder="Téléphone (pour le certificat)" class="border border-blue-200 p-2.5 rounded-lg w-full text-sm bg-white">
+                    <div class="space-y-3">
+                        <input id="prof-owner" required placeholder="Nom & Prénom" class="border border-blue-200 p-3 rounded-xl w-full text-sm bg-white focus:ring-2 focus:ring-blue-500/20 outline-none">
+                        <input id="prof-contact" placeholder="Téléphone (pour le certificat)" class="border border-blue-200 p-3 rounded-xl w-full text-sm bg-white focus:ring-2 focus:ring-blue-500/20 outline-none">
+                    </div>
                 </div>
 
-                <!-- Section Véhicule -->
-                <div class="space-y-3">
-                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider ml-1">Détails Véhicule</div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="prof-make" required placeholder="Marque (ex: Toyota)" class="border border-slate-200 p-3 rounded-xl w-full">
-                        <input id="prof-model" required placeholder="Modèle" class="border border-slate-200 p-3 rounded-xl w-full">
+                <div class="space-y-4">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider ml-1">Carte Grise</div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="prof-make" required placeholder="Marque" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
+                        <input id="prof-model" required placeholder="Modèle" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="prof-year" type="number" required placeholder="Année" class="border border-slate-200 p-3 rounded-xl w-full">
-                        <input id="prof-mileage" type="number" required placeholder="Km actuel" class="border border-slate-200 p-3 rounded-xl w-full">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input id="prof-year" type="number" required placeholder="Année" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
+                        <input id="prof-mileage" type="number" required placeholder="Km actuel" class="border border-slate-200 p-3.5 rounded-xl w-full focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
                     </div>
-                    <input id="prof-plate" required placeholder="Immatriculation (AA-123-BB)" class="border border-slate-200 p-3 rounded-xl w-full uppercase">
-                    <input id="prof-vin" placeholder="N° VIN / Châssis (Recommandé)" class="border border-slate-200 p-3 rounded-xl w-full uppercase">
+                    <input id="prof-plate" required placeholder="Immatriculation (AA-123-BB)" class="border border-slate-200 p-3.5 rounded-xl w-full uppercase focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
+                    <input id="prof-vin" placeholder="N° VIN / Châssis (Optionnel)" class="border border-slate-200 p-3.5 rounded-xl w-full uppercase focus:ring-2 focus:ring-blue-500/20 outline-none font-medium text-sm">
                 </div>
 
-                <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg mt-4">
+                <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-slate-800 transition-all active:scale-[0.98] mt-2">
                     <i data-lucide="save" class="w-5 h-5"></i> Enregistrer
                 </button>
             </form>
@@ -371,14 +442,12 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, addDoc, updateDoc, onSnapshot, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // INIT
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'autocarnet-v2';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'autocarnet-v3';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // STATE
         let currentUser = null;
         let currentVehicleId = null;
         let vehicleList = [];
@@ -386,11 +455,9 @@
         let filterType = 'all';
         let unsubLogs = null;
 
-        // DOM UTILS
         const el = (id) => document.getElementById(id);
         const formatMoney = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(amount).replace('XOF', 'FCFA');
 
-        // --- AUTH & LOAD ---
         const initAuth = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
             else await signInAnonymously(auth);
@@ -403,7 +470,6 @@
 
         initAuth();
 
-        // --- VEHICLE MANAGEMENT ---
         function loadVehicles(uid) {
             onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'vehicles'), (snapshot) => {
                 vehicleList = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
@@ -442,7 +508,6 @@
             });
         }
 
-        // --- RENDERING ---
         function renderHeaderSelector() {
             const select = el('vehicle-select');
             select.innerHTML = '';
@@ -450,6 +515,7 @@
                 const opt = document.createElement('option');
                 opt.value = v.id;
                 opt.text = `${v.make} ${v.model}`;
+                opt.className = "text-slate-900 bg-white";
                 if(v.id === currentVehicleId) opt.selected = true;
                 select.appendChild(opt);
             });
@@ -477,9 +543,14 @@
             tbody.innerHTML = '';
 
             const filtered = filterType === 'all' ? currentLogs : currentLogs.filter(l => l.type === filterType);
+            el('logs-count-badge').textContent = filtered.length;
 
             if(filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 bg-white rounded-xl border border-dashed border-slate-300 text-slate-400">Aucun historique pour ce filtre.</div>`;
+                container.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border-2 border-dashed border-slate-100 text-slate-400">
+                    <i data-lucide="history" class="w-10 h-10 mx-auto mb-3 opacity-50"></i>
+                    <p class="font-medium">Aucun historique trouvé.</p>
+                </div>`;
+                lucide.createIcons();
                 return;
             }
 
@@ -490,7 +561,7 @@
                 if (log.isCertified) {
                     if (log.hasProof && log.provider && log.providerPhone) {
                         trustIcon = '<i data-lucide="shield-check" class="w-4 h-4 text-green-500 fill-green-50"></i>';
-                        trustBadge = `<span class="text-[10px] bg-green-100 text-green-700 px-1 rounded font-bold border border-green-200">Vérifié</span>`;
+                        trustBadge = `<span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded-md font-bold border border-green-100 flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> Vérifié</span>`;
                     } else {
                         trustIcon = '<i data-lucide="alert-circle" class="w-4 h-4 text-orange-400"></i>';
                     }
@@ -498,36 +569,38 @@
 
                 const card = document.createElement('div');
                 card.className = "relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group slide-up";
-                const colors = { maintenance: 'text-blue-600', repair: 'text-orange-600', admin: 'text-purple-600' };
-                const iconColor = colors[log.type] || 'text-slate-600';
+                const colors = { maintenance: 'text-blue-600 bg-blue-100', repair: 'text-orange-600 bg-orange-100', admin: 'text-purple-600 bg-purple-100', upgrade: 'text-emerald-600 bg-emerald-100' };
+                const badgeColor = colors[log.type] || 'text-slate-600 bg-slate-100';
 
-                // Display file name if available
+                // File Logic
                 const fileDisplay = log.proofFileName ? 
-                    `<div class="flex items-center gap-2 text-green-600 text-xs font-bold truncate"><i data-lucide="paperclip" class="w-3 h-3"></i> ${log.proofFileName}</div>` :
-                    (log.hasProof ? `<div class="flex items-center gap-2 text-green-600 text-xs font-bold"><i data-lucide="paperclip" class="w-3 h-3"></i> Preuve jointe</div>` : '');
+                    `<div class="flex items-center gap-2 text-green-700 bg-green-50 px-2 py-1 rounded-lg text-xs font-bold w-fit mt-2 border border-green-100"><i data-lucide="file-check" class="w-3.5 h-3.5"></i> ${log.proofFileName}</div>` :
+                    (log.hasProof ? `<div class="flex items-center gap-2 text-green-700 bg-green-50 px-2 py-1 rounded-lg text-xs font-bold w-fit mt-2 border border-green-100"><i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Preuve jointe</div>` : '');
 
                 card.innerHTML = `
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 bg-white shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 absolute left-0 md:static transition group-hover:scale-110">
-                        <i data-lucide="circle-dot" class="w-4 h-4 ${iconColor}"></i>
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-slate-50 bg-white shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 absolute left-0 md:static transition-transform duration-300 group-hover:scale-110">
+                        <div class="w-3 h-3 rounded-full ${log.type === 'maintenance' ? 'bg-blue-500' : log.type === 'repair' ? 'bg-orange-500' : 'bg-slate-400'}"></div>
                     </div>
-                    <div class="w-[calc(100%-3.5rem)] md:w-[calc(50%-2.5rem)] ml-14 md:ml-0 bg-white rounded-xl p-5 shadow-sm border border-slate-100 hover:shadow-lg transition relative">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-2 rounded">${log.type}</span>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] ml-16 md:ml-0 bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300 relative group-hover:-translate-y-1">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded-md ${badgeColor}">${log.type}</span>
                             <span class="text-xs font-bold text-slate-400">${new Date(log.date).toLocaleDateString('fr-FR')}</span>
                         </div>
-                        <h4 class="font-bold text-slate-800 text-base flex items-center gap-2 mb-1">
+                        <h4 class="font-bold text-slate-800 text-base flex items-center gap-2 mb-2 leading-tight">
                             ${log.title} ${trustIcon}
                         </h4>
-                        <div class="text-sm text-slate-600 space-y-1 mb-3">
-                            <div class="flex items-center gap-2"><i data-lucide="gauge" class="w-3 h-3 text-slate-400"></i> ${parseInt(log.mileage).toLocaleString()} km</div>
-                            ${log.provider ? `<div class="flex items-center gap-2"><i data-lucide="store" class="w-3 h-3 text-slate-400"></i> ${log.provider} ${trustBadge}</div>` : ''}
+                        
+                        <div class="text-sm text-slate-600 space-y-2 mb-3">
+                            <div class="flex items-center gap-2"><i data-lucide="gauge" class="w-4 h-4 text-slate-400"></i> <span class="font-medium text-slate-700">${parseInt(log.mileage).toLocaleString()} km</span></div>
+                            ${log.provider ? `<div class="flex items-center gap-2"><i data-lucide="store" class="w-4 h-4 text-slate-400"></i> <span class="truncate max-w-[200px]">${log.provider}</span> ${trustBadge}</div>` : ''}
                             ${fileDisplay}
                         </div>
-                         <div class="absolute bottom-4 right-4 flex gap-3 opacity-0 group-hover:opacity-100 transition">
-                             <button onclick="editLog('${log.id}')" class="text-blue-500 hover:text-blue-700"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                             <button onclick="deleteLog('${log.id}')" class="text-red-400 hover:text-red-600"><i data-lucide="trash" class="w-4 h-4"></i></button>
+
+                         <div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button onclick="editLog('${log.id}')" class="p-1.5 hover:bg-blue-50 text-blue-500 rounded-lg transition-colors"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                             <button onclick="deleteLog('${log.id}')" class="p-1.5 hover:bg-red-50 text-red-400 rounded-lg transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
-                        <div class="font-bold text-slate-700 bg-slate-50 px-2 py-1 rounded text-sm w-fit inline-block">
+                        <div class="font-bold text-slate-700 bg-slate-50 px-3 py-1.5 rounded-lg text-sm w-fit inline-block border border-slate-100">
                             ${log.cost > 0 ? formatMoney(log.cost) : 'Gratuit'}
                         </div>
                     </div>
@@ -535,21 +608,23 @@
                 container.appendChild(card);
 
                 const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
                 tr.innerHTML = `
-                    <td class="px-5 py-3 text-slate-500 font-medium whitespace-nowrap">${new Date(log.date).toLocaleDateString('fr-FR')}</td>
-                    <td class="px-5 py-3">
+                    <td class="px-6 py-4 text-slate-500 font-medium whitespace-nowrap">${new Date(log.date).toLocaleDateString('fr-FR')}</td>
+                    <td class="px-6 py-4">
                         <div class="font-bold text-slate-800">${log.title}</div>
-                        <div class="text-xs text-slate-500">${log.provider || ''} ${log.providerPhone ? '('+log.providerPhone+')' : ''}</div>
+                        <div class="text-xs text-slate-500 mt-0.5">${log.provider || ''}</div>
                     </td>
-                    <td class="px-5 py-3 text-right font-mono text-slate-600">${parseInt(log.mileage).toLocaleString()}</td>
-                    <td class="px-5 py-3 text-center text-xs font-bold ${log.hasProof ? 'text-green-600' : 'text-slate-300'}">${log.hasProof ? 'OUI' : '-'}</td>
+                    <td class="px-6 py-4 text-right font-mono text-slate-600">${parseInt(log.mileage).toLocaleString()}</td>
+                    <td class="px-6 py-4 text-center">
+                        ${log.hasProof ? '<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700 ring-1 ring-inset ring-green-600/20">Oui</span>' : '<span class="text-slate-300">-</span>'}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
             lucide.createIcons();
         }
 
-        // --- STATS & ALERTS ---
         function updateStats() {
             const car = vehicleList.find(v => v.id === currentVehicleId);
             if(!car) return;
@@ -563,6 +638,7 @@
                 const next = parseInt(lastOil.mileage) + 10000;
                 el('stat-next-service').textContent = `~${next.toLocaleString()} km`;
                 el('stat-next-service').classList.toggle('text-red-500', next < parseInt(car.mileage));
+                el('stat-next-service').classList.toggle('text-slate-800', next >= parseInt(car.mileage));
             }
 
             let score = 0;
@@ -572,12 +648,24 @@
             const verifiedLogs = currentLogs.filter(l => l.isCertified && l.hasProof && l.provider && l.providerPhone);
             score += Math.min(verifiedLogs.length * 5, 40);
 
+            // Animate Score
             el('trust-score-text').textContent = score + "%";
-            const offset = 125 - (125 * score) / 100;
+            const offset = 150 - (150 * score) / 100;
             el('trust-score-circle').style.strokeDashoffset = offset;
             
-            if(score > 70) el('trust-score-circle').classList.add('text-green-500');
-            else if(score < 40) el('trust-score-circle').classList.add('text-red-500');
+            el('trust-score-circle').classList.remove('text-green-500', 'text-orange-500', 'text-red-500');
+            el('trust-score-icon').classList.remove('text-green-500', 'text-orange-500', 'text-red-500');
+            
+            if(score >= 70) {
+                 el('trust-score-circle').classList.add('text-green-500');
+                 el('trust-score-icon').classList.add('text-green-500');
+            } else if(score >= 40) {
+                 el('trust-score-circle').classList.add('text-orange-500');
+                 el('trust-score-icon').classList.add('text-orange-500');
+            } else {
+                 el('trust-score-circle').classList.add('text-red-500');
+                 el('trust-score-icon').classList.add('text-red-500');
+            }
         }
 
         function checkAlerts() {
@@ -590,8 +678,8 @@
                     if(days < 30) {
                         const div = document.createElement('div');
                         const urgent = days < 0;
-                        div.className = `p-3 rounded-lg flex items-center gap-3 text-sm font-bold ${urgent ? 'bg-red-50 text-red-800' : 'bg-orange-50 text-orange-800'}`;
-                        div.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i> ${log.title} ${urgent ? 'EXPIRÉ' : 'expire bientôt'}`;
+                        div.className = `p-4 rounded-xl flex items-center gap-3 text-sm font-bold shadow-sm border ${urgent ? 'bg-red-50 text-red-900 border-red-100' : 'bg-orange-50 text-orange-900 border-orange-100'}`;
+                        div.innerHTML = `<div class="p-2 bg-white/50 rounded-lg"><i data-lucide="alert-circle" class="w-5 h-5"></i></div> <div class="flex-1">${log.title} ${urgent ? 'a expiré !' : 'expire bientôt'}</div>`;
                         container.appendChild(div);
                     }
                 }
@@ -599,25 +687,18 @@
             lucide.createIcons();
         }
 
-        // --- INTERACTIONS ---
-        el('vehicle-select').addEventListener('change', (e) => switchVehicle(e.target.value));
-
+        // --- NEW MODAL LOGIC (CSS TRANSITIONS) ---
         window.toggleModal = (id, show) => {
             const m = el(id);
-            if(show) m.classList.remove('hidden'); else m.classList.add('hidden');
+            if(show) {
+                m.classList.add('active');
+            } else {
+                m.classList.remove('active');
+            }
         };
 
-        document.querySelectorAll('.modal-backdrop').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if(e.target === modal) modal.classList.add('hidden');
-            });
-        });
-        document.addEventListener('keydown', (e) => {
-            if(e.key === "Escape") document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.add('hidden'));
-        });
-        document.querySelectorAll('.btn-close-modal').forEach(b => b.addEventListener('click', (e) => {
-             e.target.closest('.modal-backdrop').classList.add('hidden');
-        }));
+        // --- INTERACTIONS ---
+        el('vehicle-select').addEventListener('change', (e) => switchVehicle(e.target.value));
 
         el('btn-add-car-header').addEventListener('click', () => openProfileModal());
         el('btn-edit-car-header').addEventListener('click', () => openProfileModal(vehicleList.find(v => v.id === currentVehicleId)));
@@ -676,18 +757,18 @@
         };
 
         window.deleteLog = (id) => {
-            if(confirm("Supprimer ?")) deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', currentVehicleId, 'logs', id));
+            if(confirm("Voulez-vous vraiment supprimer cette entrée ?")) deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', currentVehicleId, 'logs', id));
         };
 
         function openLogModal(log = null) {
             const form = el('form-add-log');
             form.reset();
             el('log-id').value = '';
-            el('file-name').textContent = "Aucun fichier";
-            el('file-icon').className = "w-8 h-8 rounded-full bg-white shadow-sm text-slate-400 flex items-center justify-center";
+            el('file-name').textContent = "Aucun fichier sélectionné";
+            el('file-icon').className = "w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center transition-colors group-hover:bg-blue-50 group-hover:text-blue-500";
             
             if(log) {
-                el('modal-log-title').innerHTML = `<i data-lucide="edit" class="w-6 h-6 text-blue-600"></i> Modifier`;
+                el('modal-log-title').innerHTML = `<i data-lucide="edit-3" class="w-6 h-6 text-blue-600"></i> Modifier l'entrée`;
                 el('log-id').value = log.id;
                 el('log-type').value = log.type;
                 el('log-date').value = log.date;
@@ -698,31 +779,34 @@
                 el('log-provider').value = log.provider || '';
                 el('log-provider-phone').value = log.providerPhone || '';
                 el('log-expiry').value = log.expiryDate || '';
+                el('btn-save-text').textContent = "Mettre à jour";
                 
                 if(log.isCertified) el('pro-details').classList.remove('hidden');
                 else el('pro-details').classList.add('hidden');
 
                 if(log.hasProof) {
-                    el('file-name').textContent = log.proofFileName ? `Fichier actuel: ${log.proofFileName}` : "Preuve existante";
-                    el('file-icon').className = "w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center";
+                    el('file-name').textContent = log.proofFileName ? `Fichier: ${log.proofFileName}` : "Preuve existante";
+                    el('file-icon').className = "w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center";
                 }
             } else {
                 el('modal-log-title').innerHTML = `<i data-lucide="plus-circle" class="w-6 h-6 text-blue-600"></i> Nouvelle Entrée`;
                 el('log-date').value = new Date().toISOString().split('T')[0];
                 el('pro-details').classList.add('hidden');
+                el('btn-save-text').textContent = "Valider l'entrée";
             }
             toggleModal('modal-add-log', true);
+            lucide.createIcons();
         }
 
-        // FILE LISTENER FIX
+        // File Listener
         el('log-file').addEventListener('change', (e) => {
-            const name = e.target.files[0]?.name || "Aucun fichier";
+            const name = e.target.files[0]?.name || "Aucun fichier sélectionné";
             el('file-name').textContent = name;
             const icon = el('file-icon');
             if(e.target.files.length > 0) {
-                icon.className = "w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center";
+                icon.className = "w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center";
             } else {
-                icon.className = "w-8 h-8 rounded-full bg-white shadow-sm text-slate-400 flex items-center justify-center";
+                icon.className = "w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center";
             }
         });
 
@@ -750,7 +834,6 @@
             }
 
             const currentLog = logId ? currentLogs.find(l => l.id === logId) : null;
-            // Determine filename to save
             const newFileName = fileInput.files.length > 0 ? fileInput.files[0].name : null;
             const finalFileName = newFileName || (currentLog ? currentLog.proofFileName : null);
 
@@ -765,7 +848,7 @@
                 providerPhone: providerPhone,
                 expiryDate: el('log-type').value === 'admin' ? el('log-expiry').value : null,
                 hasProof: fileInput.files.length > 0 || (currentLog && currentLog.hasProof),
-                proofFileName: finalFileName // SAVE FILENAME
+                proofFileName: finalFileName
             };
 
             const ref = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'vehicles', currentVehicleId, 'logs');
@@ -794,8 +877,8 @@
             el('nav-dashboard').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 w-16 transition hover:text-slate-600";
             el('nav-buyer').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-slate-400 w-16 transition hover:text-slate-600";
             
-            if(v === 'view-dashboard') el('nav-dashboard').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50 w-16 transition";
-            else el('nav-buyer').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50 w-16 transition";
+            if(v === 'view-dashboard') el('nav-dashboard').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50/80 w-16 transition-all duration-300";
+            else el('nav-buyer').className = "flex flex-col items-center gap-1 p-2 rounded-xl text-blue-600 bg-blue-50/80 w-16 transition-all duration-300";
         };
         
         el('nav-dashboard').addEventListener('click', () => switchView('view-dashboard'));
@@ -810,11 +893,11 @@
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('bg-slate-800', 'text-white', 'shadow-md');
+                    b.classList.remove('bg-slate-800', 'text-white', 'shadow-lg', 'scale-100');
                     b.classList.add('bg-white', 'text-slate-600', 'border');
                 });
                 e.target.classList.remove('bg-white', 'text-slate-600', 'border');
-                e.target.classList.add('bg-slate-800', 'text-white', 'shadow-md');
+                e.target.classList.add('bg-slate-800', 'text-white', 'shadow-lg', 'scale-100');
                 filterType = e.target.getAttribute('data-filter');
                 renderLogs();
             });
